@@ -56,8 +56,14 @@ Follow these steps in order:
    `git -C "$CLAUDE_PROJECT_DIR" ls-files <dir> | wc -l`. If it covers >20
    files, suggest replacing it with narrower file anchors.
 
-4. **Redaction.** Run the skill's redaction checklist over the draft. Strip
-   what you can; if you must abort, tell the user exactly what was caught.
+4. **Redaction.** Run the skill's redaction checklist over the draft, and
+   report what it did per the skill's D4 reporting rule: on a strip, state
+   **categories and counts only** (`redaction pass: stripped <category:
+   count, …>`), never the literal stripped strings and never a count
+   qualified with role/area context that triangulates to a person; if you
+   must abort, cite the **source pointer only** (the point in the session /
+   the draft's `source:`), never the caught strings or a category stapled to
+   a nameable source.
 
 5. **Trust + write.** Apply the skill's confirmed-vs-draft trust rule (match
    on `git config user.email` against blame/CODEOWNERS of the anchors) to set

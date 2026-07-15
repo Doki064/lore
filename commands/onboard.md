@@ -9,12 +9,21 @@ ticket, file path, or area; if absent, ask what they'll be working on before
 doing anything else.
 
 The brief **opens with a coverage header**, computed from what steps 2–4
-actually gathered: `grounded in: N confirmed + M draft notes (J disputed) +
-git history` — N/M count by `status:`, J is an overlay count of notes (either
-status) carrying a `disputed:` line. If no note anywhere in `.lore/` anchors
-into the scoped paths, say so plainly instead of bottoming out silently:
-"no lore captured for this area yet — everything below is live-derived from
-git." Any disputed note surfaced anywhere in the brief carries the footnote:
+actually gathered: `grounded in: N confirmed + M draft notes (J disputed)`
+followed by the provenance term — N/M count by `status:`, J is an overlay
+count of notes (either status) carrying a `disputed:` line. The provenance
+term and the zero-note empty-state phrase are **attempt-based** per the
+skill's coverage-header rule and flip together: git executed → `+ git
+history`; git attempted-and-denied → the degrade substitution; git never
+attempted → `+ tree+notes (git history not needed for this answer)`. When
+doc-drift spot-checks ran on docs the brief cites, the header also gains
+`+ N docs spot-checked`. If no note anywhere in `.lore/` anchors into the
+scoped paths, say so plainly instead of bottoming out silently, with the
+attempt-matched empty-state phrase — git executed: "no lore captured for
+this area yet — everything below is live-derived from git"; git never
+needed: "no lore captured for this area yet — everything below is derived
+from the tree and notes; git history wasn't needed here." Any disputed note
+surfaced anywhere in the brief carries the footnote:
 `⚠ unresolved dispute (<blame-author>, <blame-date> — not owner-verified):
 <reason>`, with author/date read live via `git blame`/`git log -1` on that
 note's `disputed:` line. Whenever the brief cites or quotes a human doc as

@@ -12,11 +12,21 @@ git history.
    read the matches.
 
 2. **Answer.** Open with the coverage header: `grounded in: N confirmed + M
-   draft notes (J disputed) + git history` — N/M count by `status:` among
-   the notes actually used, J is an overlay count of those (either status)
-   carrying a `disputed:` line. If none of the notes gathered in step 1
-   answer this, say so plainly: "no lore captured for this area yet —
-   everything below is live-derived from git." Ground every claim in a
+   draft notes (J disputed)` followed by the provenance term — N/M count by
+   `status:` among the notes actually used, J is an overlay count of those
+   (either status) carrying a `disputed:` line. The provenance term and the
+   zero-note empty-state phrase are **attempt-based** per the skill's
+   coverage-header rule and flip together: git executed → `+ git history`;
+   git attempted-and-denied → the degrade substitution; git never attempted →
+   `+ tree+notes (git history not needed for this answer)`. git history stays
+   the default source for why/decision/history questions. When doc-drift
+   spot-checks ran on docs the answer cites, the header also gains
+   `+ N docs spot-checked`. If none of the notes gathered in step 1 answer
+   this, say so plainly with the attempt-matched empty-state phrase — git
+   executed: "no lore captured for this area yet — everything below is
+   live-derived from git"; git never needed: "no lore captured for this area
+   yet — everything below is derived from the tree and notes; git history
+   wasn't needed here." Ground every claim in a
    `path:line`, a commit sha, or a note filename. Surface each note's
    `status` and staleness (label drafts `(draft, unconfirmed)` and stale
    notes `STALE — verify before trusting:`). Any disputed note carries the

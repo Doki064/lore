@@ -12,6 +12,15 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
    (`git cat-file -e <sha>^{commit}` fails — rebased away, shallow clone),
    the note is stale. Directory anchors never trigger staleness.
 
+   A note **missing `verified_sha` entirely** (legacy or hand-written, or an
+   older draft) is not stale but **never-verified** — its own sweep category,
+   rendered "no baseline — never verified against any commit", never fresh,
+   surfaced for owner confirmation in step 4. This is a deliberate divergence
+   from the tripwire hook, which coerces an absent/unreachable sha to STALE:
+   the two cannot collide (the hook fires only on `status: confirmed`
+   tripwires; never-verified is a sweep category for unconfirmed/legacy
+   notes) — do not "fix" it here.
+
    Also check retire-candidacy: for every *file* anchor (never a directory
    anchor), run
    `git -C "$CLAUDE_PROJECT_DIR" ls-files --error-unmatch -- <anchor>`. A
@@ -57,14 +66,20 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
    a user who doesn't pass the trust rule is told who does, and the note
    stays as it is.
 
-4. **Promote drafts.** List `status: draft` notes. For each the user vouches
-   for, apply the skill's write-side trust rule (email match against
-   blame/CODEOWNERS of the anchors): if the user qualifies, set
-   `status: confirmed` plus `confirmed_by`/`verified_sha`/`verified_date`;
-   if not, tell them who does qualify and leave it draft.
+4. **Promote drafts and confirm never-verified notes.** List `status: draft`
+   notes and, as their own category, the **never-verified** notes flagged in
+   step 1 (rendered "no baseline — never verified against any commit"). For
+   each the user vouches for, apply the skill's write-side trust rule (email
+   match against blame/CODEOWNERS of the anchors): if the user qualifies, set
+   `confirmed_by`/`verified_sha`/`verified_date` (and `status: confirmed` for
+   a draft); if not, tell them who does qualify and leave it as it was. When
+   a draft's `source:` line carries a `(also referenced by <TICKET-ID>)`
+   co-reference, show the **full `source:` line** as part of what the owner
+   confirms.
 
 5. **Summarize.** Report counts: fresh / re-confirmed / updated / retired /
    promoted / still-draft, plus disputed-resolved (disputes cleared or
    retired in step 2), stale-disputes (disputes flagged >90 days old in step
-   2), and retire-candidates (notes flagged in step 1, whether or not the
-   user retired them).
+   2), retire-candidates (notes flagged in step 1, whether or not the user
+   retired them), and never-verified (notes missing `verified_sha`, whether
+   or not the user confirmed them).

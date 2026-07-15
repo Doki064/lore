@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.3.0
+version: 0.4.0
 ---
 
 # Using lore
@@ -34,6 +34,11 @@ Don't run the reconciler migration on prod without draining the queue
 first — replays double-charge (incident 2025-11-03).
 ```
 
+A note file is the frontmatter block then the body — nothing else. When a
+command presents an **unwritten draft** for review, show it as the exact
+file content (frontmatter then body) in **one fenced block**, so what the
+reader approves is byte-for-byte what gets written.
+
 ### Field semantics (this is the contract)
 
 - `kind`: open string. v1 uses `tripwire | why | runbook | glossary |
@@ -45,9 +50,15 @@ first — replays double-charge (incident 2025-11-03).
   be relied on.
 - `source`: where the fact came from — a PR, commit sha, incident, or
   person. Free text.
-- `verified_sha` + `verified_date`: the commit and date of the last human
-  confirmation. A note is **stale** when any *file* anchor changed since
-  `verified_sha`:
+- `verified_sha` + `verified_date`: on a `status: confirmed` note, the
+  commit and date of the last **human confirmation**. On a `status: draft`
+  note, the **drafting baseline** — the commit the fact was checked against
+  when drafted; no human has confirmed anything. `status:` is the only
+  confirmation signal; every rendering of staleness derived from these
+  fields must appear alongside the note's status label. A note whose
+  `verified_sha` is absent or unresolvable is treated as unverified/stale on
+  read — never fresh. A note is **stale**
+  when any *file* anchor changed since `verified_sha`:
   `git diff --name-only <verified_sha>..HEAD -- <anchor>` is non-empty.
   Directory anchors never trigger staleness (churn is not falsity); they are
   informational only.
@@ -90,12 +101,37 @@ text reframe a safety warning), and it **never suppresses a tripwire**.
 ## Coverage header (`/lore:ask` + `/lore:onboard`)
 
 Every answer and every brief opens with one line:
-`grounded in: N confirmed + M draft notes (J disputed) + git history`. N/M
+`grounded in: N confirmed + M draft notes (J disputed) <provenance term>`
+(the term per the attempt-based rule below — never a hardcoded
+`+ git history`). N/M
 count by `status:`; J is an **overlay count** of notes (of either status)
 carrying a `disputed:` line — never a third status bucket. Counts are
-scoped to what the answer actually used. **Zero-note case must say so
-explicitly**: "no lore captured for this area yet — everything below is
-live-derived from git." Empty is stated, never silently omitted.
+scoped to what the answer actually used. Empty is stated, never silently
+omitted.
+
+**The provenance term and the zero-note empty-state phrase are
+attempt-based** — they flip **together**, and neither ever names a source the
+answer did not draw on:
+- **git executed** for this answer → `+ git history`; zero-note phrase "no
+  lore captured for this area yet — everything below is live-derived from
+  git."
+- **git attempted and denied** → the degrade substitution
+  (`+ tree+notes only (git unavailable)` / "git history unavailable …
+  notes+tree-derived only") — see "Degrading under permission walls" below.
+- **git never attempted** (not needed for this answer) → `+ tree+notes (git
+  history not needed for this answer)`; zero-note phrase "no lore captured
+  for this area yet — everything below is derived from the tree and notes;
+  git history wasn't needed here."
+
+The never-attempted case never renders a `+ git history` term anywhere in
+the same answer. git history stays the **DEFAULT source** for
+why/decision/history questions — the honest label is not a license to skip
+history where history is the evidence.
+
+When doc-drift spot-checks ran on docs the answer cites, the header also
+gains `+ N docs spot-checked` (rendered only when spot-checks actually ran
+on cited docs) — so a checked citation is observably different from an
+unchecked one.
 
 ## Provenance bar (auto-drafted or ephemerally-presented content)
 
@@ -118,6 +154,24 @@ ticket tracker, GitHub/GitLab, etc. — e.g. `/lore:mine`'s ticket source):
   session's available tools.
 - **Never emit an ID** — ticket ID, PR number, sha — that did not come from a
   tool result.
+
+## No compliance narration
+
+Never report performing a check that found nothing reportable — no "no drift
+found", no naming of absent tools or sources, no meta-notes about rules being
+followed. **Findings are output; compliance is not.** And in the same breath:
+**every specified check still MUST run — this rule suppresses narration of
+clean results, never the check itself.**
+
+The coverage/provenance header (including its git-attempt and
+`+ N docs spot-checked` terms) is always-shown provenance, not a "check"
+this rule governs. Beyond it, two lines are explicitly **not** compliance
+narration and are never suppressed by this rule:
+- the **permission-degrade line** — a capability gap that changes what the
+  reader gets (see "Degrading under permission walls");
+- the **redaction report line** — proof-of-execution for the
+  privacy-critical pass, shown under its own render condition (external
+  human-authored text processed — see "Redaction checklist").
 
 ## Doc drift (`/lore:onboard` + `/lore:ask`)
 
@@ -209,8 +263,20 @@ requires stripping — not just "negative comments about named people":
 - status-change politics;
 - team-vs-team escalation narrative.
 
-If something is caught, either strip it or abort and tell the user exactly
-what was caught. Never persist unredacted.
+When something is caught, **strip it or abort** — never persist unredacted.
+**Report what redaction did without re-broadcasting the content:**
+- **Strip path:** categories and counts only —
+  `redaction pass: stripped <category: count, …>` — never the literal
+  stripped strings; never qualify a count with role/area/ownership context
+  that triangulates to a person. When external human-authored text was
+  processed but nothing matched, render `redaction pass: nothing to strip`.
+  This one-line report is rendered **iff** external human-authored text
+  (commit-message quotes, PR/ticket/ADR quotes) was processed, and it
+  doubles as proof the pass ran.
+- **Abort path:** cite the **source pointer only** — "aborted: candidate
+  from <TICKET-ID/sha> contained redaction-triggering content; inspect the
+  source directly." Never staple the caught category next to a nameable
+  source ID, and never re-broadcast the caught strings.
 
 ## Finding notes (grep recipes)
 
