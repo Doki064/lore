@@ -6,7 +6,7 @@ only runtime code is the tripwire hook).
 
 ## Commands
 
-- Test: `bash tests/hook_test.sh` — must also pass on an immediate second
+- Test: `node tests/hook_test.js` — must also pass on an immediate second
   run (marker idempotency is part of the contract).
 - Local dev install: `claude plugin marketplace add <this repo> && claude
   plugin install lore@lore`. Hooks load at session start — restart Claude

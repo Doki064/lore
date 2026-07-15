@@ -54,7 +54,7 @@ visible — an unresolvable `verified_sha` counts as stale, never fresh.
 ## Status
 
 v0.1.0 — **built and live-verified**: hook test suite green
-(`tests/hook_test.sh`, 8 asserts), plugin-validator PASS, and the full loop
+(`tests/hook_test.js`, 8 asserts), plugin-validator PASS, and the full loop
 (tripwire gate firing pre-edit, natural retry, cited `/lore:ask` answers
 with staleness caveats) exercised in real `claude -p` sessions.
 
