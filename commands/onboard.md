@@ -83,8 +83,10 @@ brief follows this **pinned section order** — enrichment may vary freely
 within a section, but do not invent new top-level sections:
 
 1. **Coverage header** (the header above), counts scoped to the whole repo.
-2. **Orientation — what the repo is.** Where a legacy-vs-current pipeline
-   migration split is visible, report **cited migration events only** —
+2. **Orientation — what the repo is.** Where a legacy-vs-current split of
+   any kind is visible — a migration, rewrite, or replacement of services,
+   frameworks, data stores, pipelines, or anything else — report **cited
+   migration events only** —
    "commit/PR X migrated Y (citation)" — and **never** assert per-component
    completeness, percentages, or a migrated/not-migrated status verdict.
    State absence of evidence as "no migration evidence found in this repo for
