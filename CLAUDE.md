@@ -15,10 +15,12 @@ only runtime code is the tripwire hook).
 ## Contract rules (violating these breaks the product, not just style)
 
 - Plans live one-per-version under `docs/plans/` and freeze at release.
-  The **newest** `VXX-PLAN.md` is canonical — its §2 (data model) and §3
-  (component specs) — and `skills/using-lore/SKILL.md` restates them for
-  runtime. Change one ⇒ change both, then re-run the relevant validator
-  (plugin-validator / skill-reviewer). Never edit a frozen older plan.
+  The newest **shipped** version's `VXX-PLAN.md` is canonical — its §2
+  (data model) and §3 (component specs) — and `skills/using-lore/SKILL.md`
+  restates them for runtime; an in-progress next-version plan governs only
+  its own build until release. Change one ⇒ change both, then re-run the
+  relevant validator (plugin-validator / skill-reviewer). Never edit a
+  frozen older plan.
 - The tripwire hook is a **deny-once gate**: deny the first matching edit
   with the warning as the reason; the session marker is persisted *before*
   the deny so the retry passes. Never deny unless the marker write

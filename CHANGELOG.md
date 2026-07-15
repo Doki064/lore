@@ -7,8 +7,8 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
-- v0.4 in planning — see `docs/HANDOFF.md` and `docs/plans/V04-PLAN.md`
-  (when present).
+- v0.4 planned, build not started — see `docs/HANDOFF.md` and
+  `docs/plans/V04-PLAN.md`.
 
 ## [0.3.0] — 2026-07-15
 
