@@ -14,7 +14,7 @@ only runtime code is the tripwire hook).
 
 ## Contract rules (violating these breaks the product, not just style)
 
-- docs/plans/V02-PLAN.md §2 (data model) and §3 (component specs) are canonical;
+- docs/plans/V03-PLAN.md §2 (data model) and §3 (component specs) are canonical;
   `skills/using-lore/SKILL.md` restates them for runtime. Change one ⇒
   change both, then re-run the relevant validator (plugin-validator /
   skill-reviewer).
@@ -33,6 +33,6 @@ only runtime code is the tripwire hook).
 
 ## Docs (read on demand)
 
-- docs/plans/V02-PLAN.md — full design: data model, component specs, review history,
+- docs/plans/V03-PLAN.md — full design: data model, component specs, review history,
   build phases.
 - docs/EXAMPLE.md — end-to-end usage walkthrough.

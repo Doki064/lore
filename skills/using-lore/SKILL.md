@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.2.0
+version: 0.3.0
 ---
 
 # Using lore
@@ -108,6 +108,47 @@ mining-first candidates:
 - These stay `status: draft` forever until an email-matched owner promotes
   them; never fabricate `confirmed_by`.
 
+## Anti-confabulation bar (tool-sourced citations)
+
+Extends the cite-or-admit-ignorance rule (below) to session tools. Applies
+wherever a claim would rest on an external tracker or code-hosting tool (a
+ticket tracker, GitHub/GitLab, etc. — e.g. `/lore:mine`'s ticket source):
+- **Never narrate a search on a tool that is not verifiably present** in the
+  session's available tools.
+- **Never emit an ID** — ticket ID, PR number, sha — that did not come from a
+  tool result.
+
+## Doc drift (`/lore:onboard` + `/lore:ask`)
+
+When an answer or brief **cites or quotes a human doc** as the source for a
+claim about code, spot-check that claim against the current tree before
+citing. Scope is **grep-verifiable divergences ONLY** — a symbol, macro, file
+path, command, or config key the doc references that verifiably does not exist
+(or was renamed) in the current tree. Fixed wording:
+
+`DOC DRIFT — <doc path> references <thing>, not found in current tree (<citation>); verify with an owner.`
+
+This is an **observation, never an assertion** that the doc is wrong or that
+current code says otherwise. INTERPRETIVE divergences (strategy, architecture,
+"this approach was superseded") must **not** be flagged — at most "the doc and
+current code may disagree here; verify with an owner", with both citations and
+no verdict. Only docs the answer actually uses — never a repo-wide doc audit.
+No `verified_sha` machinery — this is a live check, not note staleness.
+**"STALE" stays reserved for git-deterministic note staleness; doc drift is a
+separate observation flag.**
+
+## Degrading under permission walls
+
+When `git`/`gh` calls come back **blocked or denied**, do not grind through
+repeated denials. In **one line**, say what was blocked; degrade to the
+readable sources (Read/Grep on the tree, `.lore/` notes); and **label the gap
+explicitly** in the coverage header / empty-state wording ("git history
+unavailable in this session — brief is notes+tree-derived only"). Concretely:
+the coverage header's `+ git history` term becomes `+ tree+notes only (git
+unavailable)` — never claim git grounding the session didn't have. **NEVER
+recommend specific allowlist entries or permission changes** — unblocking is
+the user's/admin's decision, not something to advise mid-session.
+
 ## Trust rules (when reading/answering)
 
 - **Cite or admit ignorance.** Every claim traces to a `path:line`, a commit
@@ -152,7 +193,13 @@ Scan every draft and strip or abort on:
 - credentials, tokens, API keys, secrets;
 - internal hostnames / IP addresses;
 - PII (names+contact tied to individuals, customer data);
-- negative remarks about named people.
+- negative comments about named people.
+
+**Ticket/tracker text** (from `/lore:mine`'s ticket source) additionally
+requires stripping — not just "negative comments about named people":
+- assignee / reporter / commenter names;
+- status-change politics;
+- team-vs-team escalation narrative.
 
 If something is caught, either strip it or abort and tell the user exactly
 what was caught. Never persist unredacted.

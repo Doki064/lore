@@ -57,6 +57,60 @@ session opens with one silent context line naming what's in `.lore/` and how
 to ground answers in it — no nudges, no per-person state, nothing at all in
 a repo with no lore.
 
+## What's new in v0.3
+
+Prompt/docs-level only — no runtime or hook changes. `/lore:onboard` gains an
+**overview mode**, triggered only by an explicit whole-project ask ("give me
+an overview", "the whole project/repo") — a merely broad area name still
+takes the scoped path, which stays the default. Overview mode assembles a
+pinned brief: coverage header, an orientation that cites migration events
+where the repo shows one (never a completeness verdict or a percentage —
+absence of evidence is stated as "no migration evidence found for X", not "X
+is legacy"), a docs map that names and cites entry-point docs without
+reproducing them, then tripwires/notes and decision history/who-to-ask as
+usual. Both `/lore:onboard` and `/lore:ask` now flag **doc drift**: when a
+brief or answer cites a human doc for a claim about code, it spot-checks that
+claim and, on a grep-verifiable divergence only (a symbol/path/command that no
+longer exists), emits a fixed one-line observation — never an assertion that
+the doc is wrong, and never a repo-wide audit. "STALE" stays reserved for
+git-deterministic note staleness; doc drift is separate. `/lore:mine` gains a
+conditional last source: when a ticket-tracker tool (Jira/Rally/similar) is
+present in the session, it mines incident/decision language from tickets
+too, applying an extra redaction pass for assignee/reporter/commenter names
+and status politics; when no such tool is present, this source is skipped
+silently — no ticket is ever mentioned. And every surface now degrades
+honestly under a permission wall: if `git`/`gh` calls come back blocked, lore
+says so in one line, falls back to what Read/Grep and `.lore/` can tell it,
+and labels the gap in the coverage header — it never recommends an allowlist
+entry or permission change to unblock itself (see "Locked-down
+environments" below).
+
+## Locked-down environments
+
+lore's commands read `git`/`gh` at runtime — that's how citations, blame,
+and staleness get computed. In a locked-down environment where those calls
+are blocked, lore states the gap in one line and degrades to what it can
+still do: reading the tree and `.lore/` notes directly.
+
+Whether to grant lore's commands broader `git`/`gh` access is a security
+decision for you or your admin, not lore's to make. Prefer the narrowest
+scoping that unblocks the specific call that's failing — a broad `git:*` or
+`gh:*` allowlist entry widens the execution surface for everything in the
+session, not just lore. **Lore does not recommend specific allowlist
+entries**, on this or any point.
+
+Two classes of blocker exist that no allowlist entry fixes, and lore cannot
+work around either — naming them so you recognize the symptom instead of
+chasing a permissions fix that won't land:
+- **Prompt-gate hooks** that reject slash-command submissions outright,
+  before the command ever runs.
+- **Command-rewriting hooks** that rewrite the command lore issues, so an
+  allowlist rule written against the original command misses the rewritten
+  one.
+
+In both cases lore degrades the same way: one line naming what's blocked,
+then tree+notes only.
+
 ## Trust model (the short version)
 
 One note = one fact = one markdown file in `.lore/`, anchored to code paths,
@@ -68,7 +122,9 @@ visible — an unresolvable `verified_sha` counts as stale, never fresh.
 
 ## Status
 
-v0.2.0 — **built and live-verified**: hook test suite green twice in a row
+v0.3.0 — prompt/docs-level release on top of the v0.2 runtime (no hook or
+test changes; the hook suite is a regression guard only). v0.2's live
+verification stands: hook test suite green twice in a row
 (`tests/hook_test.js`, 13 asserts), plugin-validator PASS, and the v0.2
 surfaces exercised in real `claude -p` sessions: the session-start awareness
 line reaching model context with correct counts, a disputed tripwire denying
@@ -79,4 +135,4 @@ that had never seen lore.
 Design provenance: each milestone converged from structured debates between
 simulated new-joiner and senior panels, hardened through adversarial review
 (implementer cold-reads + product red-teams), built under gatekept phase
-reviews — see [docs/plans/V02-PLAN.md](docs/plans/V02-PLAN.md). Scope is deliberately single-repo.
+reviews — see [docs/plans/V03-PLAN.md](docs/plans/V03-PLAN.md). Scope is deliberately single-repo.

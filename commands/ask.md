@@ -22,7 +22,12 @@ git history.
    notes `STALE — verify before trusting:`). Any disputed note carries the
    footnote: `⚠ unresolved dispute (<blame-author>, <blame-date> — not
    owner-verified): <reason>`, with author/date read live via `git
-   blame`/`git log -1` on that note's `disputed:` line.
+   blame`/`git log -1` on that note's `disputed:` line. If a claim here rests
+   on a human doc you cite or quote as the source, spot-check it against the
+   current tree first (the skill's doc-drift rule); on a grep-verifiable
+   divergence emit `DOC DRIFT — <doc path> references <thing>, not found in
+   current tree (<citation>); verify with an owner.` — only for docs the
+   answer actually uses, never a repo-wide doc audit.
 
 3. **Unknown.** If lore and the repo do not answer it, say "I don't know" and
    route the asker to a human: recent blame authors of the relevant paths,

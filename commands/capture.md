@@ -15,6 +15,10 @@ candidate facts: explanations given, incidents debugged, workarounds applied.
 For each candidate, grep `.lore/` for notes whose anchors already cover it
 and drop any candidate that's already covered.
 
+Open the list with a one-line count **derived from that same enumerated
+list**: state N candidates found and K dropped as already-covered, then list
+exactly the N−K that remain — the count and the list must agree.
+
 Present what's left as a numbered list, one line per candidate: proposed
 `kind` + `anchors` + a one-line body. Each candidate must cite an openable
 source (the point in the session it came from) and be phrased

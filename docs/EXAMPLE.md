@@ -22,7 +22,11 @@ In a Claude Code session inside `payments/`:
 Claude scans git history (reverts, incident/hotfix commits), merged-PR
 review threads (when `gh` is available), ADR directories, and CODEOWNERS,
 then presents up to 5 **draft** notes for review — nothing is written
-without your go-ahead, and nothing mined is ever auto-confirmed.
+without your go-ahead, and nothing mined is ever auto-confirmed. One more
+source runs last, and only conditionally: if a ticket-tracker tool (Jira,
+Rally, or similar) is present in the session, Claude also mines
+incident/decision language from tickets there; if no such tool is present,
+this source is skipped silently — no ticket is ever mentioned.
 
 ## 2. Capture a tripwire the moment it comes up
 
@@ -227,3 +231,42 @@ newer corner of `payments/` with no `.lore/` coverage at all:
 
 Nothing gets written — the brief is entirely ephemeral. Decision history
 below this section skips both commits since they're already shown above.
+
+## 8. Overview mode: asking for the whole project
+
+`/lore:onboard` normally scopes to a ticket or area (§7). An **explicit**
+whole-project ask switches it to a different, pinned skeleton instead:
+
+```
+> /lore:onboard give me an overview of the whole project
+```
+
+> `grounded in: 1 confirmed + 2 draft notes (0 disputed) + git history`
+>
+> **Orientation.** `payments/` runs a billing pipeline that moved off an
+> internal `LegacyBilling` reconciler onto the current `Ledger` service —
+> commit `9c3d1a2` migrated `reconcile()` (see `src/billing/ledger.py`). No
+> migration evidence found in this repo for the refunds pipeline — that
+> area isn't asserted as legacy, just unevidenced either way.
+>
+> **Docs map.**
+> - `docs/ARCHITECTURE.md` — service boundaries, billing/refunds split.
+> - `docs/adr/0004-ledger-migration.md` — why reconciliation moved off
+>   `LegacyBilling`.
+>
+> DOC DRIFT — `docs/ARCHITECTURE.md` references `LegacyBilling.reconcile()`,
+> not found in current tree (grep of `src/billing/` finds no `LegacyBilling`
+> symbol); verify with an owner.
+>
+> **Tripwires + notes.** The confirmed `*2` tripwire in `src/pay.py` (§2),
+> plus the two batch-drafted notes on `RefundQueue` and refund retries (§3).
+>
+> **Decision history / who to ask.** `9c3d1a2` and `65fad85` are the
+> notable commits; recent blame authors of `src/billing/` and `src/pay.py`
+> are jane and newjoiner.
+
+A scoped ask like `/lore:onboard PAY-206 dispute export` (§7) never produces
+this skeleton — only the explicit overview ask does. Note what's absent: no
+status table, no percentages, no per-component "done/not done" verdict.
+Migrations are cited event-by-event; an area with no history evidence is
+named as "no evidence found," never asserted as legacy.
