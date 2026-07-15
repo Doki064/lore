@@ -13,9 +13,10 @@ whenever you read or write a note.
 
 ## Note format
 
-One note = one file: `.lore/<kind>-<slug>.md`, slug kebab-cased from the
-note's first body line, e.g. `.lore/tripwire-reconciler-migration.md`. On
-filename collision, append `-2`, `-3`.
+One note = one file: `.lore/<kind>-<slug>.md`, slug kebab-cased from a few
+identifying words of the note's first body line (keep filenames short),
+e.g. `.lore/tripwire-reconciler-migration.md`. On filename collision,
+append `-2`, `-3`.
 
 ```markdown
 ---
@@ -122,7 +123,11 @@ ticket tracker, GitHub/GitLab, etc. — e.g. `/lore:mine`'s ticket source):
 
 When an answer or brief **cites or quotes a human doc** as the source for a
 claim about code, spot-check that claim against the current tree before
-citing. Scope is **grep-verifiable divergences ONLY** — a symbol, macro, file
+citing. A human doc is **prose documentation** — README, files under `docs/`,
+ADRs, wiki-style pages. `.lore/` notes and code comments are **never**
+doc-drift targets: notes have their own `verified_sha` staleness machinery,
+and comments live with the code they describe. Scope is **grep-verifiable
+divergences ONLY** — a symbol, macro, file
 path, command, or config key the doc references that verifiably does not exist
 (or was renamed) in the current tree. Fixed wording:
 
@@ -145,7 +150,10 @@ readable sources (Read/Grep on the tree, `.lore/` notes); and **label the gap
 explicitly** in the coverage header / empty-state wording ("git history
 unavailable in this session — brief is notes+tree-derived only"). Concretely:
 the coverage header's `+ git history` term becomes `+ tree+notes only (git
-unavailable)` — never claim git grounding the session didn't have. **NEVER
+unavailable)` — never claim git grounding the session didn't have. That
+substitution applies **only when git history itself is unavailable**; if
+only `gh` is blocked, git grounding stands — state the loss as the
+PR-thread source only. **NEVER
 recommend specific allowlist entries or permission changes** — unblocking is
 the user's/admin's decision, not something to advise mid-session.
 

@@ -20,8 +20,10 @@ Sources, in order:
 
 1. **Git history.** Read `git log` for reverts and for commits keyed on
    incident/fix/workaround/hotfix language, restricted to files that still
-   exist in the tree. Draft as `kind: tripwire` or `why` with `source:` the
-   commit sha(s) and `anchors:` the still-existing files.
+   exist in the tree. Match these keywords as **whole words** — substring
+   hits ("pre**fix**", "**fix**ture", "**fix**ed-wording") are not fix
+   commits and do not count. Draft as `kind: tripwire` or `why` with
+   `source:` the commit sha(s) and `anchors:` the still-existing files.
 
 2. **PR review threads** (only if `gh` is installed and this is a GitHub
    repo — check with `gh repo view` and skip this source silently otherwise).

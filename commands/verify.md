@@ -30,8 +30,14 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
    `verified_sha` (a short `git log --oneline <verified_sha>..HEAD --
    <anchors>` helps). If the dispute is older than ~90 days, flag it: "stale
    dispute — resolve it or it is noise." If step 1 also flagged the note a
-   retire candidate, say so here. Ask the user to pick one of the same three
-   outcomes as stale notes:
+   retire candidate, say so here.
+
+   **Resolving is an owner action.** Before offering re-confirm or update,
+   apply the skill's write-side trust rule (email match against
+   blame/CODEOWNERS of the anchors) exactly as step 4 does. If the user does
+   not qualify, tell them who does and leave the dispute in place — only
+   owners clear a dispute. If they qualify, ask them to pick one of the same
+   three outcomes as stale notes:
    - **re-confirm** — the fact still holds: clear the `disputed` line, bump
      `verified_sha` to current HEAD, `verified_date` to today, `confirmed_by`
      to the user's git name.
@@ -47,7 +53,9 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
    resolved in step 2 (body, anchors, what changed since `verified_sha`, and
    whether step 1 flagged it a retire candidate) and ask the user to pick one
    of the same three outcomes: **re-confirm**, **update**, or **retire**, as
-   above.
+   above. The same owner check as step 2 gates re-confirm and update here —
+   a user who doesn't pass the trust rule is told who does, and the note
+   stays as it is.
 
 4. **Promote drafts.** List `status: draft` notes. For each the user vouches
    for, apply the skill's write-side trust rule (email match against

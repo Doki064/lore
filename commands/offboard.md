@@ -28,8 +28,11 @@ on; otherwise find them:
 4. **Write through the capture rules.** Each confirmed draft goes through
    `/lore:capture`'s steps: dedup against existing notes, anchor lint (>20
    files in a directory anchor ⇒ suggest narrower), redaction checklist, then
-   the trust rule — the departing engineer is a blame author of these
-   anchors, so their confirmations qualify as `status: confirmed`.
+   the trust rule **applied as usual — check it, don't assume it**: for the
+   areas of their authorship monopoly the email match will pass and their
+   confirmations land `status: confirmed`; where the match does not pass
+   (the interview drifted to code they didn't author), the note stays
+   `draft` like anyone else's.
 
 5. **Wrap up.** Summarize what was captured and which priority areas remain
    uncovered, so a follow-up session can resume the list.

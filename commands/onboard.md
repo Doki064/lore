@@ -27,7 +27,8 @@ relies on, never a repo-wide doc audit.
 1. **Resolve the scope — and pick the mode.** If `$ARGUMENTS` (or, when you
    asked what they'll work on, their answer) is an **explicit
    whole-project/overview ask** — it contains "overview", "the whole
-   project/repo", "how the system fits together", or equivalent — enter
+   project/repo", "how the system fits together", or an unambiguous
+   whole-repo synonym; never inferred from breadth alone — enter
    **Overview mode** (below): skip path-scoping and follow the overview
    skeleton. A merely broad area name (a big subsystem) is **not** an overview
    ask — it stays on this scoped path, which never emits the overview
@@ -97,8 +98,9 @@ within a section, but do not invent new top-level sections:
 4. **Tripwires + relevant notes** — steps 2–3 above, whole-repo.
 5. **Decision history + who to ask** — steps 5–6 above, whole-repo.
 
-When `.lore/` is sparse or empty for the whole repo, the mining fallback (step
-4 above, exhaustive-and-reported) still applies but is **bounded**: a
-recent-history window (default the last ~200 commits or ~12 months, whichever
+When `.lore/` is empty or has fewer than 3 notes repo-wide, the mining
+fallback (step 4 above, exhaustive-and-reported) still applies but is
+**bounded**: a recent-history window (default the last ~200 commits or ~12
+months, whichever
 is larger) and at most 5 strongest candidates, no padding. State the window
 you used in the brief.
