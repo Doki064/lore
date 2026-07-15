@@ -1,0 +1,16 @@
+{
+  "description": "Warn before editing a file guarded by a confirmed lore tripwire",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/tripwire.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

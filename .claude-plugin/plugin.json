@@ -1,0 +1,9 @@
+{
+  "name": "lore",
+  "version": "0.1.0",
+  "description": "Capture tribal knowledge as a byproduct of normal work and serve it back cited, work-scoped, and staleness-checked.",
+  "author": {
+    "name": "Doki064"
+  },
+  "keywords": ["knowledge", "onboarding", "documentation", "tripwire"]
+}

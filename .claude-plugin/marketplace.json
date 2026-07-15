@@ -1,0 +1,13 @@
+{
+  "name": "lore",
+  "owner": {
+    "name": "Doki064"
+  },
+  "plugins": [
+    {
+      "name": "lore",
+      "source": "./",
+      "description": "Capture tribal knowledge as a byproduct of normal work and serve it back cited, work-scoped, and staleness-checked."
+    }
+  ]
+}
