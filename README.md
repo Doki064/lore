@@ -85,6 +85,28 @@ and labels the gap in the coverage header — it never recommends an allowlist
 entry or permission change to unblock itself (see "Locked-down
 environments" below).
 
+## What's new in v0.4
+
+Prompt/docs-level only — no runtime or hook changes. `/lore:mine`'s report
+is now a fixed five-part shape: what the deterministic floor found (or
+didn't), findings from whichever conditional sources actually ran this
+session, every draft shown as the exact file content it would write, a
+`redaction pass: …` line whenever external text (PR/ticket/ADR quotes) was
+processed, then the closing write-or-not ask. A ticket that corroborates an
+existing git-sourced candidate no longer drafts a second note — it folds
+into the git draft's `source:` line as `(also referenced by <TICKET-ID>)`.
+Redaction reporting is pinned everywhere it runs: a strip states categories
+and counts only, never the caught strings; an abort names the source
+pointer only, never the triggering text next to a nameable ticket/commit
+ID. `/lore:ask` and `/lore:onboard`'s coverage header is now
+**attempt-based** about git — it reads differently depending on whether git
+executed, was attempted and denied, or was never needed for that answer,
+and the empty-state phrase always flips with it — plus a `+ N docs
+spot-checked` term whenever a doc-drift spot-check actually ran on a cited
+doc. `/lore:verify` gains a **never-verified** sweep category for notes
+that have no `verified_sha` baseline at all (legacy or hand-written notes),
+distinct from both fresh and stale.
+
 ## Locked-down environments
 
 lore's commands read `git`/`gh` at runtime — that's how citations, blame,
@@ -114,25 +136,33 @@ then tree+notes only.
 ## Trust model (the short version)
 
 One note = one fact = one markdown file in `.lore/`, anchored to code paths,
-with provenance (`source`), a verification commit (`verified_sha`), and a
-status (`draft`/`confirmed`). No anchor, no trust. Only owners (blame
-authors / CODEOWNERS) can confirm; only confirmed tripwires gate edits;
-anything unverifiable is labeled, never asserted. Staleness is always
-visible — an unresolvable `verified_sha` counts as stale, never fresh.
+with provenance (`source`), a `verified_sha` (last human verification on a
+`confirmed` note; the drafting baseline on a `draft` note — `status:` is
+the only confirmation signal), and a status (`draft`/`confirmed`). No
+anchor, no trust. Only owners (blame authors / CODEOWNERS) can confirm;
+only confirmed tripwires gate edits; anything unverifiable is labeled,
+never asserted. Staleness is always visible — an unresolvable or missing
+`verified_sha` counts as stale (or, if absent entirely, **never-verified**),
+never fresh.
 
 ## Status
 
-v0.3.0 — prompt/docs-level release on top of the v0.2 runtime (no hook or
-test changes; the hook suite is a regression guard only). v0.2's live
-verification stands: hook test suite green twice in a row
+v0.4.0 — prompt/docs-level release on top of the v0.2 runtime (no hook or
+test changes since v0.2; the hook suite is a regression guard only). v0.2's
+live verification stands: hook test suite green twice in a row
 (`tests/hook_test.js`, 13 asserts), plugin-validator PASS, and the v0.2
 surfaces exercised in real `claude -p` sessions: the session-start awareness
 line reaching model context with correct counts, a disputed tripwire denying
 once with the dispute footnoted (never reframed) then passing on retry, and
 mining-first `/lore:onboard` producing a cited, zero-write brief on a repo
-that had never seen lore.
+that had never seen lore. v0.4's surfaces were live-smoked on final bytes
+across **two models** (11 fresh `claude -p` runs, sonnet + opus): the pinned
+mine skeleton with zero absent-source mentions, the ticket co-reference fold
+and its negative case, categories-and-counts redaction reporting, all three
+coverage-header provenance variants, DOC DRIFT firing with fixed wording,
+and verify's never-verified category.
 
 Design provenance: each milestone converged from structured debates between
 simulated new-joiner and senior panels, hardened through adversarial review
 (implementer cold-reads + product red-teams), built under gatekept phase
-reviews — see [docs/plans/V03-PLAN.md](docs/plans/V03-PLAN.md). Scope is deliberately single-repo.
+reviews — see [docs/plans/V04-PLAN.md](docs/plans/V04-PLAN.md). Scope is deliberately single-repo.

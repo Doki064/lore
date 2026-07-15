@@ -22,26 +22,60 @@ In a Claude Code session inside `payments/`:
 Claude scans git history (reverts, incident/hotfix commits), merged-PR
 review threads (when `gh` is available), ADR directories, CODEOWNERS, and —
 only when the session actually has a ticket-tracker tool (Jira/Rally via
-MCP) — incident/decision tickets. An absent source leaves no trace: no
-"skipped" line, no ticket ever mentioned without the tool. Up to 5 **draft**
-candidates come back for review:
+MCP) — incident/decision tickets. A source whose precondition doesn't hold
+this session is never named — no "skipped" line, no ticket ever mentioned
+without the tool. The report is a fixed five-part shape: what the floor
+found, findings from whichever conditional sources actually ran, every
+draft shown as the exact file content it would write, a redaction line,
+then the write-or-not ask.
 
-> **Source 1 — git history (exhaustive):** 1 revert, 1 hotfix commit.
-> **Source 3 — ADRs:** none (`docs/adr/` has only accepted-and-current
-> decisions). Sources 2/4 had nothing durable.
+> **Floor.** Source 1 — git history (exhaustive): 1 revert, 1 hotfix
+> commit. Source 3 — ADR presence: none (`docs/adr/` has only
+> accepted-and-current decisions).
 >
-> 1. tripwire — anchors: `src/billing/export.py` — commit `a1b2c3d`
->    reverted an eager-export change; message cites wrong totals when the
->    export ran before dispute finalization.
-> 2. why — anchors: `src/refunds/vendor.py` — hotfix `e4f5a6b`: "export
->    retried too aggressively, vendor started rate-limiting us."
+> **Source 2 — PR review threads (`gh` present):** one candidate, a
+> reviewer comment on the merged PR touching `src/refunds/vendor.py`.
+
+```markdown
+# .lore/tripwire-billing-export-revert.md
+---
+kind: tripwire
+anchors:
+  - src/billing/export.py
+source: commit a1b2c3d
+verified_sha: 9f1c4e2
+verified_date: 2026-07-15
+status: draft
+---
+Don't ship eager export before dispute finalization — commit `a1b2c3d`
+reverted this once already; message cited wrong totals.
+```
+
+```markdown
+# .lore/why-vendor-rate-limit.md
+---
+kind: why
+anchors:
+  - src/refunds/vendor.py
+source: commit e4f5a6b, PR review comment
+verified_sha: 9f1c4e2
+verified_date: 2026-07-15
+status: draft
+---
+Retries capped at 3/min — hotfix `e4f5a6b`: "export retried too
+aggressively, vendor started rate-limiting us"; a PR reviewer confirmed
+the same limit independently.
+```
+
+> redaction pass: nothing to strip
 >
 > Write these to `.lore/` as drafts?
 
 Nothing is written without your go-ahead, and nothing mined is ever
-auto-confirmed. Note the shape: every candidate cites a sha you can
-`git show`, phrased as what the commit *did* — never as what "the team
-decided."
+auto-confirmed. Note the shape: `verified_sha`/`verified_date` on a draft
+are the **drafting baseline** — the commit checked, not a human
+confirmation — and every candidate is phrased as what happened, never as
+what "the team decided."
 
 ## 2. Capture a tripwire the moment it comes up
 
@@ -214,12 +248,17 @@ drafts from §3 come up. Jane vouches for the `RefundQueue` why-note; her
 email matches blame on `src/refunds/queue.py`, so it flips to
 `confirmed_by: jane` with a fresh `verified_sha`. She isn't sure the 60s
 retry window is still right, so that one stays `draft` for whoever owns
-`retry.py`. Two more flags surface automatically in the same sweep: a
+`retry.py`. Three more flags surface automatically in the same sweep: a
 runbook anchored to a file deleted last quarter is marked a **retire
-candidate** (the code the fact describes is gone), and a dispute nobody has
-touched in over 90 days gets "stale dispute — resolve it or it is noise."
-The summary counts it all: fresh / re-confirmed / promoted / still-draft,
-disputed-resolved, stale-disputes, retire-candidates.
+candidate** (the code the fact describes is gone); a dispute nobody has
+touched in over 90 days gets "stale dispute — resolve it or it is noise";
+and a hand-written `glossary` note predating `verified_sha` tracking has no
+baseline commit at all — a **never-verified** category, distinct from both
+fresh and stale, rendered as "no baseline — never verified against any
+commit." Jane confirms it's still accurate and stamps its first
+`verified_sha`. The summary counts it all: fresh / re-confirmed / promoted
+/ still-draft, disputed-resolved, stale-disputes, retire-candidates,
+never-verified.
 
 ## 7. People flows
 
@@ -264,7 +303,7 @@ whole-project ask switches it to a different, pinned skeleton instead:
 > /lore:onboard give me an overview of the whole project
 ```
 
-> `grounded in: 1 confirmed + 2 draft notes (0 disputed) + git history`
+> `grounded in: 1 confirmed + 2 draft notes (0 disputed) + git history + 1 docs spot-checked`
 >
 > **Orientation.** `payments/` runs a billing pipeline that moved off an
 > internal `LegacyBilling` reconciler onto the current `Ledger` service —
@@ -292,7 +331,11 @@ A scoped ask like `/lore:onboard PAY-206 dispute export` (§7) never produces
 this skeleton — only the explicit overview ask does. Note what's absent: no
 status table, no percentages, no per-component "done/not done" verdict.
 Migrations are cited event-by-event; an area with no history evidence is
-named as "no evidence found," never asserted as legacy.
+named as "no evidence found," never asserted as legacy. Note also the
+coverage header's `+ 1 docs spot-checked` term: it appears because the
+DOC DRIFT check above actually ran against `docs/ARCHITECTURE.md`, the one
+doc the brief cites for a code claim — a doc merely listed in the docs map
+without being cited for a claim never adds to that count.
 
 ## 9. Locked-down environments: degrade, don't grind
 

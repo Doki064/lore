@@ -7,8 +7,61 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
-- v0.4 planned, build not started — see `docs/HANDOFF.md` and
-  `docs/plans/V04-PLAN.md`.
+## [0.4.0] - 2026-07-15
+
+Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
+zero data-model field additions. Theme: honesty and contract robustness —
+every item hardens an existing contract the evidence showed breaking, mostly
+under a model swap. Scope driven by the v0.3 dogfood watchlist plus scripted
+fixture probes and field probes on a real enterprise repo session
+(anonymized: no org/repo/ticket/person identifiers).
+
+### Changed
+- `/lore:mine`'s output is now a pinned five-part skeleton (floor report,
+  conditional-source findings, drafts shown as exact file content, a
+  `redaction pass: …` line, closing ask), backed by a skill-wide
+  no-compliance-narration rule — replaces "be silent about absent sources"
+  prose, which did not survive a model swap.
+- Coverage-header git provenance and the zero-note empty-state phrase are
+  now **attempt-based** (executed / attempted-and-denied / never attempted),
+  flipping together; a `+ N docs spot-checked` term renders when doc-drift
+  spot-checks actually ran on cited docs. Git history remains the default
+  source for why/decision questions.
+- `verified_sha`/`verified_date` field semantics are rewritten to a split
+  form: last human confirmation on a `confirmed` note, drafting baseline on
+  a `draft` note — `status:` is the only confirmation signal. `/lore:mine`
+  stamps HEAD on every draft it presents.
+- Redaction reporting, everywhere it runs, is pinned to categories+counts on
+  the strip path and a source-pointer-only citation on the abort path —
+  never the caught strings, never a category stapled to a nameable
+  ticket/commit ID.
+- Mine's deterministic-floor tokenization is pinned (any non-letter
+  character is a word boundary — `hotfix_cicd` counts, `prefix`/`fixture` do
+  not) and its ≤5-draft cap gets a one-line selection tiebreak (incidents
+  and outages first, then reverts and rationale-bearing why/ADR decisions
+  with a reserved slot, then workarounds); a candidate whose why is already
+  stated by an inline comment at the anchor is skipped, with a
+  when-in-doubt-draft guard and a cited drop note.
+
+### Added
+- `/lore:mine`: a mappable ticket that lands on an existing git-sourced
+  candidate's artifact or path folds in as a bare co-reference
+  (`(also referenced by <TICKET-ID>)`) instead of drafting a second note;
+  shown to the owner at promotion.
+- `/lore:verify`: a **never-verified** sweep category for notes missing
+  `verified_sha` entirely (legacy or hand-written notes) — rendered
+  distinctly, never fresh, never confused with the tripwire hook's own
+  stale-coercion on unresolvable shas.
+
+### Fixed
+- Surfaces no longer narrate their own compliance — no "no drift found", no
+  naming of absent tools/sources, no meta-notes about rules being followed.
+  Findings are output; the underlying checks still always run, only their
+  clean-result narration is suppressed.
+- `/lore:mine` degrades under blocked git the way `/lore:ask` already did:
+  previously it stalled with a stray irrelevant tool call and asked how to
+  proceed; now it says so in one line, the floor enters its unavailable
+  state, and it continues on tree-readable sources without asking.
 
 ## [0.3.0] — 2026-07-15
 
