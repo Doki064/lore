@@ -27,7 +27,8 @@ claude plugin install lore@lore
 
 Restart Claude Code (hooks load at session start). Notes live in the
 **target repo's** `.lore/` directory — versioned, greppable, PR-reviewed
-like code.
+like code. See [docs/EXAMPLE.md](docs/EXAMPLE.md) for an end-to-end
+walkthrough.
 
 ## What you get
 
@@ -59,5 +60,5 @@ with staleness caveats) exercised in real `claude -p` sessions.
 
 Design provenance: converged from structured debates between simulated
 new-joiner and senior panels, hardened through two adversarial review
-rounds, built by Opus under gatekept phase reviews — see [docs/plans/V01-PLAN.md](docs/plans/V01-PLAN.md).
+rounds, built by Opus under gatekept phase reviews — see [docs/plans/V02-PLAN.md](docs/plans/V02-PLAN.md).
 Scope is deliberately single-repo for v1.

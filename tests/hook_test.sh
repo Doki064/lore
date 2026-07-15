@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Unit test for hooks/tripwire.sh. Builds a temp git repo fixture with a
+# Unit test for hooks/tripwire.js. Builds a temp git repo fixture with a
 # scratch TMPDIR, exercises asserts (a)-(g), tears down. Non-zero exit on any
 # failure. Self-contained: pass on repeat runs (markers live in the scratch
 # TMPDIR, wiped at setup).
 set -u
 
-HOOK="$(cd "$(dirname "$0")/.." && pwd)/hooks/tripwire.sh"
+HOOK="$(cd "$(dirname "$0")/.." && pwd)/hooks/tripwire.js"
 FAILS=0
 
 pass() { printf 'ok   - %s\n' "$1"; }
@@ -98,7 +98,7 @@ run_hook() { # session, relpath -> stdout of hook
   local sess="$1" rel="$2" json
   json=$(jq -cn --arg s "$sess" --arg f "$REPO/$rel" \
     '{session_id:$s, tool_input:{file_path:$f}}')
-  CLAUDE_PROJECT_DIR="$REPO" printf '%s' "$json" | CLAUDE_PROJECT_DIR="$REPO" bash "$HOOK"
+  CLAUDE_PROJECT_DIR="$REPO" printf '%s' "$json" | CLAUDE_PROJECT_DIR="$REPO" node "$HOOK"
 }
 
 is_valid_json() { printf '%s' "$1" | jq . >/dev/null 2>&1; }
