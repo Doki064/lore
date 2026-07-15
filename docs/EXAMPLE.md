@@ -56,10 +56,52 @@ removing it double-charges customers on retries.
 
 The note rides the normal PR into `main`. Total senior time: ~10 seconds.
 
-## 3. The tripwire fires — at the moment of danger
+## 3. Batch capture: triage a whole session at once
 
-Weeks later, a new joiner (or their Claude) edits `src/pay.py`. The first
-edit attempt is stopped **once**, with the warning as the reason:
+Later in the same session, after debugging a flaky refund test and hearing
+an explanation of why `RefundQueue` polls instead of using a webhook:
+
+```
+> /lore:capture
+```
+
+No arguments — Claude scans the session instead of one fact, drops anything
+already covered in `.lore/`, and presents a numbered list:
+
+```
+1. why — anchors: src/refunds/queue.py — RefundQueue polls because the
+   vendor's webhook silently drops retries under load (from this session's
+   debugging of the flaky test, see the trace above)
+2. tripwire — anchors: src/refunds/retry.py — retrying a refund within 60s
+   of the last attempt double-submits to the vendor (incident just now)
+
+Pick a number, several, `all`, or `none`.
+```
+
+```
+> all
+```
+
+Both run the normal draft → dedup → anchor lint → redaction steps — but
+**always land as `status: draft`**, even though the same senior is a blame
+author of both files. Batch triage isn't confirmation; these two wait for
+`/lore:verify` to be promoted one at a time.
+
+## 4. The tripwire fires — at the moment of danger
+
+Weeks later, a new joiner (or their Claude) opens the repo. Their session
+starts with one line of context — lore's only proactive surface besides the
+tripwire itself:
+
+```
+lore: 3 note(s) (1 confirmed tripwire(s)) in .lore/. Ground answers in
+them: /lore:ask <question>, /lore:onboard <area>. Capture new durable
+facts with /lore:capture.
+```
+
+(A repo with no `.lore/` notes hears nothing at all.) Then they edit
+`src/pay.py`. The first edit attempt is stopped **once**, with the warning
+as the reason:
 
 ```
 TRIPWIRE for src/pay.py (.lore/tripwire-pay-double-charge.md, confirmed
@@ -74,36 +116,114 @@ The retry passes. One warning per note per session — repeat edits stay
 silent. If `src/pay.py` has changed since the note was verified, the
 warning re-alerts once with a `STALE — verify before trusting:` prefix.
 
-## 4. Ask, and get cited answers
+## 5. Ask, and get cited answers
 
 ```
 > /lore:ask why does charge() multiply by 2?
 ```
 
+> grounded in: 1 confirmed + 0 draft notes (0 disputed) + git history
+>
 > - `src/pay.py:2` — `return amount * 2  # retry-safe`
 > - Note `.lore/tripwire-pay-double-charge.md` (status: **confirmed**,
 >   verified 2026-07-14 at `65fad85`): compensates a vendor rounding bug…
 >
 > Staleness: anchor unchanged since verification.
 
-Unknown answers are never invented — Claude says "I don't know" and routes
-you to the recent blame authors (or CODEOWNERS), then offers
-`/lore:capture` once the human answers, so it's only worked out once.
+The first line is the coverage header — at a glance, how much of the answer
+is team-verified versus inferred. Unknown answers are never invented —
+Claude says "I don't know" and routes you to the recent blame authors (or
+CODEOWNERS), then offers `/lore:capture` once the human answers, so it's
+only worked out once.
 
-## 5. Keep it trustworthy
+### Disputing a note
+
+A new joiner reads the tripwire above and pushes back — the vendor rounding
+bug was fixed in PR #700, months after the note was confirmed:
+
+```
+> /lore:ask does charge() still need the *2?
+```
+
+> `.lore/tripwire-pay-double-charge.md` (status: **confirmed**, verified
+> 2026-07-14 at `65fad85`): Never remove the `*2`... compensates a vendor
+> rounding bug.
+>
+> That contradicts PR #700, which the vendor merged 2026-06-01 — worth
+> flagging?
+
+```
+> yes, PR #700 fixed it
+```
+
+Claude adds one line to the note's frontmatter — `disputed: PR #700 (merged
+2026-06-01) fixed the vendor rounding bug; *2 may no longer be needed` — and
+nothing else. `status:` stays `confirmed`, the body stays untouched, and the
+tripwire keeps firing: the next edit to `src/pay.py` still shows the full
+warning, with the hook's author-free footnote appended —
+`(Unresolved reader dispute on file — not owner-verified: "PR #700 (merged
+2026-06-01) fixed the vendor rounding bug; *2 may no longer be needed". An
+owner resolves it via /lore:verify.)` — the warning itself is never
+reframed. In `/lore:ask`, `/lore:onboard`, and `/lore:verify`, the same
+dispute renders with its author and age read live from git blame:
+`⚠ unresolved dispute (newjoiner, 2026-07-14 — not owner-verified): …`.
+An owner resolves it, not the disputer.
+
+## 6. Keep it trustworthy
 
 ```
 > /lore:verify
 ```
 
-Sweeps every note: anchors changed since `verified_sha` ⇒ walk through
-**re-confirm / update / retire**; vetted drafts get promoted (trust rule
-enforced — only blame authors/CODEOWNERS of the anchors can confirm).
+Sweeps every note in order: **disputed notes first**, then staleness, then
+draft promotion.
 
-## 6. People flows
+The disputed tripwire from above surfaces first, with the disputer, the
+dispute's age, and what changed in `src/pay.py` since `verified_sha`. Jane
+(a blame author) checks PR #700, agrees it's dead, and picks **retire** —
+the file is deleted and the dispute goes with it. Had she disagreed, she'd
+pick **re-confirm** instead, which clears the `disputed` line and bumps
+`verified_sha` without touching the body.
+
+Then the sweep continues as before: remaining stale notes ⇒ walk through
+**re-confirm / update / retire**; vetted drafts get promoted (trust rule
+enforced — only blame authors/CODEOWNERS of the anchors can confirm). Two
+more flags surface automatically in the same sweep: a runbook anchored to a
+file deleted last quarter is marked a **retire candidate** (the code the
+fact describes is gone), and a dispute nobody has touched in over 90 days
+gets "stale dispute — resolve it or it is noise." The summary counts it
+all: disputed-resolved, stale-disputes, and retire-candidates.
+
+## 7. People flows
 
 - New joiner, first ticket: `/lore:onboard PAY-123 refund flow` → a brief
   scoped to that work — tripwires first, decision history, who to ask.
 - Someone leaving: `/lore:offboard` → bus-factor scan finds the areas only
   they ever touched, then an in-context interview drafts the notes before
   the knowledge walks out the door.
+
+### Onboarding into an area nobody's written lore for yet
+
+A different joiner picks up a ticket in `src/refunds/dispute_export/` — a
+newer corner of `payments/` with no `.lore/` coverage at all:
+
+```
+> /lore:onboard PAY-206 dispute export
+```
+
+> `grounded in: 0 confirmed + 0 draft notes (0 disputed) + git history` — no
+> lore captured for this area yet — everything below is live-derived from
+> git.
+>
+> **Unconfirmed guesses from git history — not team-verified lore. Confirm
+> with an owner before relying on these.**
+> - `git show a1b2c3d`: reverted an eager-export change — export ran before
+>   the dispute was finalized, producing wrong totals.
+> - `git show e4f5a6b`: "hotfix: export retried too aggressively, vendor
+>   started rate-limiting us."
+>
+> Worth keeping? `/lore:mine` will draft these properly, or `/lore:capture`
+> once you've confirmed them with an owner.
+
+Nothing gets written — the brief is entirely ephemeral. Decision history
+below this section skips both commits since they're already shown above.

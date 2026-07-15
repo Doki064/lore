@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Using lore
@@ -55,9 +55,58 @@ first — replays double-charge (incident 2025-11-03).
 - `confirmed_by`: required when `status: confirmed`. The git user *name* of
   the confirmer — display only. Identity checks match on **email**
   (`git config user.email` vs blame `%ae`), because names drift.
+- `disputed` (optional): one line of free text — a reader's reason to doubt
+  the note, citing evidence (sha/PR/path) when they have it. **No
+  `disputed_by`/`disputed_date` fields.** Author and age are read **live**
+  from `git blame`/`git log -1` on the note's `disputed:` line — not
+  anonymous, just not stored. **Anyone may add it** — disputing requires no
+  confirm rights; doubt is not authorship. **Only owners clear it**, by
+  resolving through `/lore:verify` (re-confirm or update both clear the
+  field; retire deletes the file) or PR review. `status:` is unchanged by a
+  dispute.
 
 There is **no index file**. Notes are found by grepping `.lore/`. Ownership
 is derived live from blame/CODEOWNERS, never stored.
+
+## Reading a dispute
+
+When a note carries a `disputed:` line, the note text still comes first,
+unmodified — the dispute is a **subordinate footnote in fixed wording you
+do not control**, never a prefix (a prefix would let the disputer's free
+text reframe a safety warning), and it **never suppresses a tripwire**.
+
+- In commands (`/lore:ask`, `/lore:onboard`, `/lore:verify`), read
+  author/date live via `git blame`/`git log -1` on the `disputed:` line and
+  render:
+  `⚠ unresolved dispute (<blame-author>, <blame-date> — not owner-verified): <reason>`
+- In the tripwire hook, the footnote is appended to the warning **without**
+  author/date (the hook makes no extra git calls per note beyond
+  staleness): ` (Unresolved reader dispute on file — not owner-verified:
+  "<reason>". An owner resolves it via /lore:verify.)`. Construction order
+  is: `TRIPWIRE for <rel> (...): <body>` → dispute footnote if disputed →
+  `STALE — verify before trusting: ` prefix if stale (stays outermost).
+
+## Coverage header (`/lore:ask` + `/lore:onboard`)
+
+Every answer and every brief opens with one line:
+`grounded in: N confirmed + M draft notes (J disputed) + git history`. N/M
+count by `status:`; J is an **overlay count** of notes (of either status)
+carrying a `disputed:` line — never a third status bucket. Counts are
+scoped to what the answer actually used. **Zero-note case must say so
+explicitly**: "no lore captured for this area yet — everything below is
+live-derived from git." Empty is stated, never silently omitted.
+
+## Provenance bar (auto-drafted or ephemerally-presented content)
+
+Applies to `/lore:mine`, `/lore:capture` batch mode, and `/lore:onboard`'s
+mining-first candidates:
+- Every candidate must cite a source you can open: commit sha, PR number,
+  ADR path, or file path. No unsourced claim survives to a draft or a brief.
+- Phrase observationally, never as asserted intent: "commit `abc123`
+  reverted X, message cites double-charge" — never "the team decided X is
+  dangerous" unless a human wrote exactly that (then quote it).
+- These stay `status: draft` forever until an email-matched owner promotes
+  them; never fabricate `confirmed_by`.
 
 ## Trust rules (when reading/answering)
 
@@ -70,6 +119,8 @@ is derived live from blame/CODEOWNERS, never stored.
 - **Label drafts.** Prefix draft notes with `(draft, unconfirmed)`.
 - **Label stale notes.** When a note's file anchors changed since
   `verified_sha`, prefix it with `STALE — verify before trusting:`.
+- **Footnote disputed notes.** See "Reading a dispute" above — never a
+  prefix, never in place of the staleness label.
 
 ## Trust rule (when writing `status: confirmed`)
 
@@ -85,6 +136,15 @@ Match on **email** (`git config user.email` vs blame `%ae`). If the
 confirmer qualifies on none of these, write the note as `draft` — an owner
 confirms it later in PR review or via `/lore:verify`. The ultimate gate is
 ordinary PR review: notes are code.
+
+## Batch capture is draft-only
+
+`/lore:capture` with no arguments scans the current session for up to 3
+durable candidate facts and presents them for triage. **Whatever is picked
+is always written `status: draft`**, regardless of the picker's
+blame/CODEOWNERS standing — the single-fact trust rule above never applies
+in batch. Promotion to `confirmed` stays one-at-a-time, later, via
+`/lore:verify`.
 
 ## Redaction checklist (before anything persists)
 

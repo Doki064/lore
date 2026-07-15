@@ -42,6 +42,21 @@ walkthrough.
 | `/lore:onboard` | New joiner: a brief scoped to the ticket in front of you — tripwires first, decision history, who to ask. Not a wiki tour. |
 | `/lore:offboard` | Departing engineer: bus-factor scan finds their monopolies, then an in-context interview drafts the notes before the knowledge walks out. |
 
+## What's new in v0.2
+
+Same trust rules, four additions. Anyone can flag a note `disputed:` from
+`/lore:ask` — no owner rights required — but the warning never disappears or
+reframes itself: it's footnoted, git-attributed, and resolved later by an
+owner via `/lore:verify` (disputes are swept first, ahead of staleness).
+`/lore:capture` with no arguments triages up to 3 durable facts from the
+current session at once; batch-picked notes always land as `status: draft`
+— triage speed never buys `confirmed`. `/lore:onboard` on an area with zero
+`.lore/` coverage mines git history inline instead of coming up empty,
+clearly framed as unconfirmed guesses to confirm with an owner. And every
+session opens with one silent context line naming what's in `.lore/` and how
+to ground answers in it — no nudges, no per-person state, nothing at all in
+a repo with no lore.
+
 ## Trust model (the short version)
 
 One note = one fact = one markdown file in `.lore/`, anchored to code paths,
@@ -53,12 +68,15 @@ visible — an unresolvable `verified_sha` counts as stale, never fresh.
 
 ## Status
 
-v0.1.0 — **built and live-verified**: hook test suite green
-(`tests/hook_test.js`, 8 asserts), plugin-validator PASS, and the full loop
-(tripwire gate firing pre-edit, natural retry, cited `/lore:ask` answers
-with staleness caveats) exercised in real `claude -p` sessions.
+v0.2.0 — **built and live-verified**: hook test suite green twice in a row
+(`tests/hook_test.js`, 13 asserts), plugin-validator PASS, and the v0.2
+surfaces exercised in real `claude -p` sessions: the session-start awareness
+line reaching model context with correct counts, a disputed tripwire denying
+once with the dispute footnoted (never reframed) then passing on retry, and
+mining-first `/lore:onboard` producing a cited, zero-write brief on a repo
+that had never seen lore.
 
-Design provenance: converged from structured debates between simulated
-new-joiner and senior panels, hardened through two adversarial review
-rounds, built by Opus under gatekept phase reviews — see [docs/plans/V02-PLAN.md](docs/plans/V02-PLAN.md).
-Scope is deliberately single-repo for v1.
+Design provenance: each milestone converged from structured debates between
+simulated new-joiner and senior panels, hardened through adversarial review
+(implementer cold-reads + product red-teams), built under gatekept phase
+reviews — see [docs/plans/V02-PLAN.md](docs/plans/V02-PLAN.md). Scope is deliberately single-repo.

@@ -156,6 +156,12 @@ for (const name of notes) {
   const when = note.fields.verified_date || '';
 
   let msg = `TRIPWIRE for ${rel} (${notefile}, confirmed by ${who} on ${when}): ${note.body}`;
+  // Subordinate dispute footnote: appended after the body, inside the TRIPWIRE
+  // text, so the STALE prefix stays outermost. Fixed wording the disputer does
+  // not control; it never suppresses the warning. No git blame here — the hook
+  // stays cheap (commands render author/date; the hook makes no extra git call).
+  const disputed = (note.fields.disputed || '').trim();
+  if (disputed) msg += ` (Unresolved reader dispute on file — not owner-verified: "${disputed}". An owner resolves it via /lore:verify.)`;
   if (stale) msg = `STALE — verify before trusting: ${msg}`;
   messages.push(msg);
 }

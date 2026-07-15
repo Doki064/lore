@@ -11,7 +11,11 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const HOOK = path.join(__dirname, '..', 'hooks', 'tripwire.js');
+const SESSION_START = path.join(__dirname, '..', 'hooks', 'session_start.js');
 let fails = 0;
+// Throwaway dirs for the session_start asserts (k)-(m): fresh, never the shared
+// REPO fixture, so ordering can't matter. Removed in teardown.
+const sessionDirs = [];
 
 const pass = (m) => console.log(`ok   - ${m}`);
 const fail = (m) => { console.log(`FAIL - ${m}`); fails++; };
@@ -96,6 +100,34 @@ confirmed_by: tester
 Its verified_sha does not resolve, so it is always STALE.
 `);
 
+  note('tripwire-disputed.md', `---
+kind: tripwire
+anchors:
+  - src/dispute.py
+source: PR #5
+verified_sha: ${SHA}
+verified_date: 2026-07-14
+status: confirmed
+confirmed_by: tester
+disputed: refund path rewritten in #612; queue drain no longer needed
+---
+Drain the queue before running the reconciler.
+`);
+
+  note('tripwire-disputed-stale.md', `---
+kind: tripwire
+anchors:
+  - lib/dispstale.py
+source: PR #6
+verified_sha: 0000000
+verified_date: 2026-07-14
+status: confirmed
+confirmed_by: tester
+disputed: superseded by config flag in #700
+---
+This warning is both stale and disputed.
+`);
+
   // --- harness -------------------------------------------------------------
   // os.tmpdir() honors TMPDIR only on POSIX; Windows uses TEMP/TMP. Set all
   // three so marker isolation works everywhere.
@@ -103,6 +135,14 @@ Its verified_sha does not resolve, so it is always STALE.
     execFileSync(process.execPath, [HOOK], {
       input: JSON.stringify({ session_id: sess, tool_input: { file_path: path.join(REPO, ...rel.split('/')) } }),
       env: { ...process.env, CLAUDE_PROJECT_DIR: REPO, TMPDIR: SCRATCH, TEMP: SCRATCH, TMP: SCRATCH },
+      encoding: 'utf8',
+    });
+
+  // session_start runner: env CLAUDE_PROJECT_DIR, no stdin, no denies. Always
+  // exits 0, so execFileSync never throws; returns stdout (empty when silent).
+  const runSession = (projectDir) =>
+    execFileSync(process.execPath, [SESSION_START], {
+      env: { ...process.env, CLAUDE_PROJECT_DIR: projectDir },
       encoding: 'utf8',
     });
 
@@ -114,6 +154,7 @@ Its verified_sha does not resolve, so it is always STALE.
     const o = JSON.parse(out);
     return o.decision === 'block' && re.test(o.reason);
   };
+  const reasonOf = (out) => (out && isValidJson(out) ? (JSON.parse(out).reason || '') : '');
 
   // --- (a) exact-path match fires ------------------------------------------
   let out = runHook('sess-a', 'src/billing/reconciler.py');
@@ -159,9 +200,77 @@ Its verified_sha does not resolve, so it is always STALE.
   blocksWith(out, /^STALE — verify before trusting:/)
     ? pass('(g) STALE when verified_sha does not resolve')
     : fail(`(g) STALE when verified_sha does not resolve [out=${out}]`);
+
+  // --- (i) confirmed + disputed => footnote appended after the warning ------
+  out = runHook('sess-i', 'src/dispute.py');
+  {
+    const r = reasonOf(out);
+    const iTrip = r.indexOf('TRIPWIRE for src/dispute.py');
+    const iDisp = r.indexOf('Unresolved reader dispute on file');
+    blocksWith(out, /TRIPWIRE for src\/dispute\.py/)
+      && r.includes('Unresolved reader dispute on file')
+      && r.includes('refund path rewritten in #612; queue drain no longer needed')
+      && iTrip !== -1 && iTrip < iDisp
+      ? pass('(i) confirmed+disputed: deny fires, TRIPWIRE precedes dispute footnote')
+      : fail(`(i) confirmed+disputed: deny fires, TRIPWIRE precedes dispute footnote [out=${out}]`);
+  }
+
+  // --- (j) disputed + stale => STALE prefix outermost, footnote still present --
+  out = runHook('sess-j', 'lib/dispstale.py');
+  blocksWith(out, /^STALE — verify before trusting:/)
+    && reasonOf(out).includes('Unresolved reader dispute on file')
+    && reasonOf(out).includes('superseded by config flag in #700')
+    ? pass('(j) disputed+stale: STALE prefix outermost, dispute footnote inside')
+    : fail(`(j) disputed+stale: STALE prefix outermost, dispute footnote inside [out=${out}]`);
+
+  // --- session_start: fresh throwaway dirs (never the shared REPO fixture) ---
+  const mkLore = () => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'lore-sess-'));
+    sessionDirs.push(d);
+    return d;
+  };
+
+  // --- (k) .lore/ with 3 notes, 1 confirmed tripwire => JSON awareness line -
+  {
+    const d = mkLore();
+    const lore = path.join(d, '.lore');
+    fs.mkdirSync(lore);
+    fs.writeFileSync(path.join(lore, 'tripwire-x.md'), '---\nkind: tripwire\nstatus: confirmed\n---\nbody\n');
+    fs.writeFileSync(path.join(lore, 'note-1.md'), '---\nstatus: draft\n---\nbody\n');
+    fs.writeFileSync(path.join(lore, 'note-2.md'), '---\nstatus: confirmed\n---\nbody\n');
+    const sout = runSession(d);
+    let ac = '';
+    if (sout && isValidJson(sout)) {
+      const o = JSON.parse(sout);
+      ac = (o.hookSpecificOutput && o.hookSpecificOutput.additionalContext) || '';
+    }
+    ac.includes('lore: 3 note(s) (1 confirmed tripwire(s))') && ac.includes('/lore:ask')
+      ? pass('(k) session_start emits JSON awareness line with correct counts')
+      : fail(`(k) session_start emits JSON awareness line with correct counts [out=${sout}]`);
+  }
+
+  // --- (l) no .lore/ => empty stdout, exit 0 --------------------------------
+  {
+    const d = mkLore(); // dir exists, no .lore/ created
+    runSession(d).trim() === ''
+      ? pass('(l) session_start silent when .lore/ absent')
+      : fail('(l) session_start silent when .lore/ absent');
+  }
+
+  // --- (m) .lore/ present but no .md files => empty stdout, exit 0 -----------
+  {
+    const d = mkLore();
+    const lore = path.join(d, '.lore');
+    fs.mkdirSync(lore);
+    fs.writeFileSync(path.join(lore, 'README.txt'), 'not a note\n');
+    runSession(d).trim() === ''
+      ? pass('(m) session_start silent when .lore/ has no .md files')
+      : fail('(m) session_start silent when .lore/ has no .md files');
+  }
 } finally {
   // --- teardown -------------------------------------------------------------
   fs.rmSync(WORK, { recursive: true, force: true });
+  for (const d of sessionDirs) fs.rmSync(d, { recursive: true, force: true });
 }
 
 // --- result -----------------------------------------------------------------
