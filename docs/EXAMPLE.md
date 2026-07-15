@@ -20,13 +20,28 @@ In a Claude Code session inside `payments/`:
 ```
 
 Claude scans git history (reverts, incident/hotfix commits), merged-PR
-review threads (when `gh` is available), ADR directories, and CODEOWNERS,
-then presents up to 5 **draft** notes for review — nothing is written
-without your go-ahead, and nothing mined is ever auto-confirmed. One more
-source runs last, and only conditionally: if a ticket-tracker tool (Jira,
-Rally, or similar) is present in the session, Claude also mines
-incident/decision language from tickets there; if no such tool is present,
-this source is skipped silently — no ticket is ever mentioned.
+review threads (when `gh` is available), ADR directories, CODEOWNERS, and —
+only when the session actually has a ticket-tracker tool (Jira/Rally via
+MCP) — incident/decision tickets. An absent source leaves no trace: no
+"skipped" line, no ticket ever mentioned without the tool. Up to 5 **draft**
+candidates come back for review:
+
+> **Source 1 — git history (exhaustive):** 1 revert, 1 hotfix commit.
+> **Source 3 — ADRs:** none (`docs/adr/` has only accepted-and-current
+> decisions). Sources 2/4 had nothing durable.
+>
+> 1. tripwire — anchors: `src/billing/export.py` — commit `a1b2c3d`
+>    reverted an eager-export change; message cites wrong totals when the
+>    export ran before dispute finalization.
+> 2. why — anchors: `src/refunds/vendor.py` — hotfix `e4f5a6b`: "export
+>    retried too aggressively, vendor started rate-limiting us."
+>
+> Write these to `.lore/` as drafts?
+
+Nothing is written without your go-ahead, and nothing mined is ever
+auto-confirmed. Note the shape: every candidate cites a sha you can
+`git show`, phrased as what the commit *did* — never as what "the team
+decided."
 
 ## 2. Capture a tripwire the moment it comes up
 
@@ -189,14 +204,22 @@ the file is deleted and the dispute goes with it. Had she disagreed, she'd
 pick **re-confirm** instead, which clears the `disputed` line and bumps
 `verified_sha` without touching the body.
 
-Then the sweep continues as before: remaining stale notes ⇒ walk through
-**re-confirm / update / retire**; vetted drafts get promoted (trust rule
-enforced — only blame authors/CODEOWNERS of the anchors can confirm). Two
-more flags surface automatically in the same sweep: a runbook anchored to a
-file deleted last quarter is marked a **retire candidate** (the code the
-fact describes is gone), and a dispute nobody has touched in over 90 days
-gets "stale dispute — resolve it or it is noise." The summary counts it
-all: disputed-resolved, stale-disputes, and retire-candidates.
+Resolving disputes is an owner action: had `newjoiner` run the sweep
+instead, Claude would name who qualifies (blame authors / CODEOWNERS of
+`src/pay.py`) and leave the dispute standing.
+
+Then the sweep continues: remaining stale notes ⇒ walk through
+**re-confirm / update / retire**. Last, draft promotion — the two batch
+drafts from §3 come up. Jane vouches for the `RefundQueue` why-note; her
+email matches blame on `src/refunds/queue.py`, so it flips to
+`confirmed_by: jane` with a fresh `verified_sha`. She isn't sure the 60s
+retry window is still right, so that one stays `draft` for whoever owns
+`retry.py`. Two more flags surface automatically in the same sweep: a
+runbook anchored to a file deleted last quarter is marked a **retire
+candidate** (the code the fact describes is gone), and a dispute nobody has
+touched in over 90 days gets "stale dispute — resolve it or it is noise."
+The summary counts it all: fresh / re-confirmed / promoted / still-draft,
+disputed-resolved, stale-disputes, retire-candidates.
 
 ## 7. People flows
 
@@ -270,3 +293,24 @@ this skeleton — only the explicit overview ask does. Note what's absent: no
 status table, no percentages, no per-component "done/not done" verdict.
 Migrations are cited event-by-event; an area with no history evidence is
 named as "no evidence found," never asserted as legacy.
+
+## 9. Locked-down environments: degrade, don't grind
+
+Same overview ask, but in a hardened session where every `git` call is
+denied by policy. Claude doesn't hammer the permission wall or coach you to
+widen it — one line names the gap, and the coverage header stops claiming
+git grounding:
+
+> git calls are blocked in this session — decision history and blame-based
+> "who to ask" are omitted; this brief is derived from the tree and
+> `.lore/` notes only.
+>
+> `grounded in: 1 confirmed + 2 draft notes (0 disputed) + tree+notes only
+> (git unavailable)`
+
+Everything notes and the tree can support still arrives (tripwires, note
+bodies, the docs map); everything that needed git is named as missing
+rather than silently thinned. lore never suggests which allowlist entry
+would unblock it — that's your admin's call, not a knowledge tool's. See
+"Locked-down environments" in the README for the blocker classes no
+allowlist entry can fix.
