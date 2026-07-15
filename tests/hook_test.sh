@@ -102,29 +102,35 @@ run_hook() { # session, relpath -> stdout of hook
 }
 
 is_valid_json() { printf '%s' "$1" | jq . >/dev/null 2>&1; }
+# Deny-once contract: output is a block decision whose reason carries the
+# warning. blocks_with OUT REGEX -> true iff decision=="block" and reason
+# matches.
+blocks_with() {
+  [ -n "$1" ] && is_valid_json "$1" && \
+    printf '%s' "$1" | jq -e --arg re "$2" \
+      '.decision == "block" and (.reason | test($re))' >/dev/null
+}
 
 # --- (a) exact-path match fires --------------------------------------------
 out=$(run_hook sess-a src/billing/reconciler.py)
-if [ -n "$out" ] && is_valid_json "$out" && \
-   printf '%s' "$out" | jq -e '.systemMessage | test("TRIPWIRE for src/billing/reconciler.py")' >/dev/null; then
-  pass "(a) fires on exact-path match"
-else
-  fail "(a) fires on exact-path match [out=$out]"
-fi
+blocks_with "$out" 'TRIPWIRE for src/billing/reconciler.py' \
+  && pass "(a) blocks once on exact-path match, reason carries warning" \
+  || fail "(a) blocks once on exact-path match, reason carries warning [out=$out]"
 
-# --- (e) second identical call is suppressed by the session marker ----------
+# --- (h) block output is valid JSON ----------------------------------------
+is_valid_json "$out" && pass "(h) block output is valid JSON" \
+                     || fail "(h) block output is valid JSON [out=$out]"
+
+# --- (e) retry passes: second identical call produces no output -------------
 out=$(run_hook sess-a src/billing/reconciler.py)
-[ -z "$out" ] && pass "(e) repeat call suppressed by marker" \
-              || fail "(e) repeat call suppressed by marker [out=$out]"
+[ -z "$out" ] && pass "(e) retry passes silently (marker suppresses)" \
+              || fail "(e) retry passes silently (marker suppresses) [out=$out]"
 
 # --- (b) dir-prefix match fires --------------------------------------------
 out=$(run_hook sess-b migrations/0001.sql)
-if [ -n "$out" ] && is_valid_json "$out" && \
-   printf '%s' "$out" | jq -e '.systemMessage | test("TRIPWIRE for migrations/0001.sql")' >/dev/null; then
-  pass "(b) fires on dir-prefix match"
-else
-  fail "(b) fires on dir-prefix match [out=$out]"
-fi
+blocks_with "$out" 'TRIPWIRE for migrations/0001.sql' \
+  && pass "(b) blocks on dir-prefix match" \
+  || fail "(b) blocks on dir-prefix match [out=$out]"
 
 # --- (c) non-match is silent -----------------------------------------------
 out=$(run_hook sess-c README.md)
@@ -140,21 +146,15 @@ out=$(run_hook sess-d src/other.py)
 printf 'def reconcile(): return 2\n' > "$REPO/src/billing/reconciler.py"
 git -C "$REPO" commit -qam "change reconciler"
 out=$(run_hook sess-a src/billing/reconciler.py)   # same session as (a)/(e)
-if [ -n "$out" ] && is_valid_json "$out" && \
-   printf '%s' "$out" | jq -e '.systemMessage | test("^STALE — verify before trusting:")' >/dev/null; then
-  pass "(f) STALE prefix appears and re-alerts across the state change"
-else
-  fail "(f) STALE prefix appears and re-alerts across the state change [out=$out]"
-fi
+blocks_with "$out" '^STALE — verify before trusting:' \
+  && pass "(f) STALE prefix blocks and re-alerts across the state change" \
+  || fail "(f) STALE prefix blocks and re-alerts across the state change [out=$out]"
 
 # --- (g) unresolvable verified_sha => STALE --------------------------------
 out=$(run_hook sess-g lib/thing.py)
-if [ -n "$out" ] && is_valid_json "$out" && \
-   printf '%s' "$out" | jq -e '.systemMessage | test("^STALE — verify before trusting:")' >/dev/null; then
-  pass "(g) STALE when verified_sha does not resolve"
-else
-  fail "(g) STALE when verified_sha does not resolve [out=$out]"
-fi
+blocks_with "$out" '^STALE — verify before trusting:' \
+  && pass "(g) STALE when verified_sha does not resolve" \
+  || fail "(g) STALE when verified_sha does not resolve [out=$out]"
 
 # --- result ----------------------------------------------------------------
 if [ "$FAILS" -eq 0 ]; then

@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 # lore tripwire hook (PreToolUse: Edit|Write|MultiEdit).
-# Non-blocking: always permits the edit; only emits a systemMessage when the
-# edited file is guarded by a confirmed lore tripwire. A broken hook is worse
-# than no warning, so every failure path exits 0 silently.
+# Deny-once gate: when the edited file is guarded by a confirmed lore
+# tripwire, deny ONCE with the warning as the reason — the only PreToolUse
+# channel that verifiably reaches the model (systemMessage on an allow
+# decision is silently dropped by the harness as of Claude Code 2.1.209).
+# The session marker is persisted before the deny, so the immediate retry of
+# the same edit passes silently (empty stdout = allow): trip, read the sign,
+# step over. One deny per note per {fresh,stale} state per session; a
+# fresh->stale transition re-alerts once. A broken hook is worse than no
+# warning, so every failure path exits 0 silently — and we never deny unless
+# the marker that lets the retry through was actually written.
 set -u
 shopt -s nullglob
 
@@ -95,7 +102,9 @@ for f in "$dir"/.lore/tripwire-*.md; do
   # raw note path contains '/'. A fresh->stale transition re-alerts once.
   marker="$tmp/lore-${sid}-$(basename "$f")-${state}"
   [ -e "$marker" ] && continue
-  : > "$marker" 2>/dev/null || true
+  # Marker write failed => skip the warning rather than deny: a deny whose
+  # retry would be denied again is a lockout, not a tripwire.
+  : > "$marker" 2>/dev/null || continue
 
   notefile=${f#"$dir"/}
   who=$(fm_field "$f" confirmed_by)
@@ -110,6 +119,13 @@ done
 
 [ -n "$messages" ] || exit 0
 
+# Deny ONCE with the warning as the reason — the only PreToolUse channel that
+# verifiably reaches the model (systemMessage on allow is dropped by the
+# harness as of Claude Code 2.1.209). Markers are already written above, so
+# the immediate retry passes silently: trip, read the sign, step over.
+messages="$messages
+
+(lore tripwire gate: warning delivered, marker set — retry the same edit now and it will go through.)"
 jq -cn --arg msg "$messages" \
-  '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow"},systemMessage:$msg}'
+  '{decision:"block",reason:$msg,hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"deny",permissionDecisionReason:$msg},systemMessage:$msg}'
 exit 0

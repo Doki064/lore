@@ -16,26 +16,48 @@ new joiners is tacit: tripwires, the *why* behind weird code, who to ask.
 Seniors won't write docs, but they will **react**: confirm a note Claude
 drafted from their own session, in under ten seconds. New joiners won't read
 a tour, but they will trust an answer that **cites a file/commit or admits
-ignorance**, and that warns them *before* they edit a landmine.
+ignorance**, and that stops them *before* they edit a landmine.
 
-## Core loop
+## Install
 
-1. **Capture** — during any session, `/lore:capture` (or a one-line prompt at
-   review time) drafts a note from what just happened; the human confirms.
-2. **Store** — notes are markdown files in `.lore/` of the target repo:
-   versioned, greppable, PR-reviewable, anchored to code paths, with
-   provenance and a `verified` commit.
-3. **Recall** — a hook warns when you edit a file with a confirmed tripwire;
-   `/lore:ask` answers questions grounded in lore + repo with citations;
-   `/lore:onboard` scopes it to your first ticket.
-4. **Trust** — `/lore:verify` flags notes whose anchors changed since last
-   verification ("verify me", never silent staleness).
+```bash
+claude plugin marketplace add ~/projects/lore   # or the repo URL
+claude plugin install lore@lore
+```
 
-See [docs/plans/V01-PLAN.md](docs/plans/V01-PLAN.md) for the full design and build plan.
+Restart Claude Code (hooks load at session start). Notes live in the
+**target repo's** `.lore/` directory — versioned, greppable, PR-reviewed
+like code.
+
+## What you get
+
+| Surface | What it does |
+|---|---|
+| `/lore:capture` | Draft a note from the current session; dedup, anchor lint, redaction, then confirmed-or-draft by the trust rule. Under 10 seconds of human time. |
+| **tripwire gate** (hook) | Editing a file guarded by a confirmed tripwire? The first edit attempt is stopped once, with the warning as the reason; the immediate retry passes. Once per note per session; stale notes re-alert once, labeled. |
+| `/lore:ask` | Grounded Q&A: answers from lore + code + git history, every claim cited, drafts and stale notes labeled, routes to a human when it doesn't know. |
+| `/lore:mine` | Cold start: seed draft notes from reverts, incident commits, PR review threads (via `gh`), ADRs, CODEOWNERS. |
+| `/lore:verify` | Staleness sweep: re-confirm / update / retire notes whose anchors changed; promote vetted drafts. |
+| `/lore:onboard` | New joiner: a brief scoped to the ticket in front of you — tripwires first, decision history, who to ask. Not a wiki tour. |
+| `/lore:offboard` | Departing engineer: bus-factor scan finds their monopolies, then an in-context interview drafts the notes before the knowledge walks out. |
+
+## Trust model (the short version)
+
+One note = one fact = one markdown file in `.lore/`, anchored to code paths,
+with provenance (`source`), a verification commit (`verified_sha`), and a
+status (`draft`/`confirmed`). No anchor, no trust. Only owners (blame
+authors / CODEOWNERS) can confirm; only confirmed tripwires gate edits;
+anything unverifiable is labeled, never asserted. Staleness is always
+visible — an unresolvable `verified_sha` counts as stale, never fresh.
 
 ## Status
 
-Pre-implementation. Design converged from a structured debate between
-simulated new-joiner and senior-engineer panels, then hardened through
-adversarial review rounds (see docs/plans/V01-PLAN.md). Scope is deliberately single-repo
-for v1; cross-repo knowledge waits until the core loop is proven.
+v0.1.0 — **built and live-verified**: hook test suite green
+(`tests/hook_test.sh`, 8 asserts), plugin-validator PASS, and the full loop
+(tripwire gate firing pre-edit, natural retry, cited `/lore:ask` answers
+with staleness caveats) exercised in real `claude -p` sessions.
+
+Design provenance: converged from structured debates between simulated
+new-joiner and senior panels, hardened through two adversarial review
+rounds, built by Opus under gatekept phase reviews — see [docs/plans/V01-PLAN.md](docs/plans/V01-PLAN.md).
+Scope is deliberately single-repo for v1.
