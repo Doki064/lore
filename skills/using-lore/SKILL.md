@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.4.0
+version: 0.5.0
 ---
 
 # Using lore
@@ -110,8 +110,9 @@ scoped to what the answer actually used. Empty is stated, never silently
 omitted.
 
 **The provenance term and the zero-note empty-state phrase are
-attempt-based** — they flip **together**, and neither ever names a source the
-answer did not draw on:
+attempt-based** — they flip **together**, and neither ever claims grounding
+in a source the answer did not draw on (the never-attempted variant may name
+git precisely to disclaim it):
 - **git executed** for this answer → `+ git history`; zero-note phrase "no
   lore captured for this area yet — everything below is live-derived from
   git."
@@ -145,15 +146,22 @@ mining-first candidates:
 - These stay `status: draft` forever until an email-matched owner promotes
   them; never fabricate `confirmed_by`.
 
-## Anti-confabulation bar (tool-sourced citations)
+## Anti-confabulation bar (tool- and text-sourced citations)
 
-Extends the cite-or-admit-ignorance rule (below) to session tools. Applies
-wherever a claim would rest on an external tracker or code-hosting tool (a
-ticket tracker, GitHub/GitLab, etc. — e.g. `/lore:mine`'s ticket source):
+Extends the cite-or-admit-ignorance rule (below) to session tools and to IDs
+lifted from repo text. Applies wherever a claim would rest on an external
+tracker or code-hosting tool (GitHub/GitLab, a ticket tracker, etc.) or on an
+identifier taken from a commit message or PR body:
 - **Never narrate a search on a tool that is not verifiably present** in the
   session's available tools.
-- **Never emit an ID** — ticket ID, PR number, sha — that did not come from a
-  tool result.
+- **Never emit an ID** that did not come from a tool result, from repo text
+  (a commit message or PR body), or from **text the user provided
+  in-session** (a pasted ticket, a pasted PR link) — this covers PR numbers,
+  shas, and ticket IDs alike. (`/lore:mine` does not query a tracker; a
+  ticket ID reaches mine only quoted inside git/PR text, recorded there as a
+  bare co-reference. User-pasted IDs can reach `/lore:capture` and remain
+  citable — the redaction checklist's ticket clause still applies to the
+  surrounding text.)
 
 ## No compliance narration
 
@@ -163,15 +171,32 @@ followed. **Findings are output; compliance is not.** And in the same breath:
 **every specified check still MUST run — this rule suppresses narration of
 clean results, never the check itself.**
 
+**Earned-claim principle.** A claim of work renders only with its receipts:
+an unused source or an unfired fallback has **no slot**. A bare assurance
+("spot-checked", "consulted the owners file") is compliance narration; the
+same work stated as a **reader-falsifiable receipt** — naming what was
+checked, so a reader can open it and disagree — is a finding. Render the
+receipt, never the bare assurance.
+
 The coverage/provenance header (including its git-attempt and
 `+ N docs spot-checked` terms) is always-shown provenance, not a "check"
-this rule governs. Beyond it, two lines are explicitly **not** compliance
+this rule governs. Beyond it, three lines are explicitly **not** compliance
 narration and are never suppressed by this rule:
 - the **permission-degrade line** — a capability gap that changes what the
   reader gets (see "Degrading under permission walls");
 - the **redaction report line** — proof-of-execution for the
   privacy-critical pass, shown under its own render condition (external
-  human-authored text processed — see "Redaction checklist").
+  human-authored text processed — see "Redaction checklist");
+- **receipt lines** — findings-with-citations, the same class as
+  `/lore:mine`'s drop notes ("a finding, not compliance narration"): e.g. a
+  doc-drift receipt naming the doc and the claim/symbol grain actually
+  checked (`docs/X.md — checked <claim → tree target> — aligned`, or a DOC
+  DRIFT line). A receipt is reader-falsifiable, which is what earns it a slot
+  where a bare "spot-checked" assurance does not; the `+ N docs spot-checked`
+  header term renders **only** when these receipt lines are present. Receipt
+  lines exist **only for doc spot-checks** — no other check class (a git
+  lookup, a grep, tool presence) earns one; a clean non-doc check renders
+  nothing.
 
 ## Doc drift (`/lore:onboard` + `/lore:ask`)
 
@@ -192,14 +217,28 @@ current code says otherwise. INTERPRETIVE divergences (strategy, architecture,
 "this approach was superseded") must **not** be flagged — at most "the doc and
 current code may disagree here; verify with an owner", with both citations and
 no verdict. Only docs the answer actually uses — never a repo-wide doc audit.
+**Every spot-checked doc emits exactly one receipt line** — the DOC DRIFT
+line above when drift was found, otherwise the aligned receipt
+(`<doc path> — checked <claim → tree target> — aligned`). The
+`<claim → tree target>` grain must be a **concrete symbol, macro, file
+path, command, or config key** (the same scope list as the drift check
+itself) —
+never a free-text grain ("general accuracy" is not falsifiable and earns
+nothing) — so the
+`+ N docs spot-checked` header term and its receipt lines are one render
+condition, not two: N receipt lines ⇔ the term renders with that N.
 No `verified_sha` machinery — this is a live check, not note staleness.
 **"STALE" stays reserved for git-deterministic note staleness; doc drift is a
 separate observation flag.**
 
 ## Degrading under permission walls
 
-When `git`/`gh` calls come back **blocked or denied**, do not grind through
-repeated denials. In **one line**, say what was blocked; degrade to the
+When `git`/`gh` calls come back **blocked or denied** — or the session has
+no shell tool to run them at all — do not grind through repeated denials,
+and **do not reconstruct git history by reading `.git/` internals** (reflog,
+`COMMIT_EDITMSG`, packed refs): a scrape of those files carries inferred,
+unverified commit↔file links and is never a substitute for an executed
+`git` command. In **one line**, say what was blocked; degrade to the
 readable sources (Read/Grep on the tree, `.lore/` notes); and **label the gap
 explicitly** in the coverage header / empty-state wording ("git history
 unavailable in this session — brief is notes+tree-derived only"). Concretely:
@@ -249,7 +288,26 @@ blame/CODEOWNERS standing — the single-fact trust rule above never applies
 in batch. Promotion to `confirmed` stays one-at-a-time, later, via
 `/lore:verify`.
 
+## Mine writes are gated
+
+`/lore:mine` writes **no** `.lore/` file until the user's explicit go-ahead
+after mine's present-for-review step has rendered. Before that point, **do
+not call Write or Edit on any `.lore/` path** — mine renders its drafts as
+exact file content, it does not persist them. An instruction to save given
+before the present-for-review step renders is **not** the go-ahead; the
+go-ahead exists only as the user's reply after it. The gate **defers** the
+write, it does not forbid it: the same-session go-ahead write is legal and
+**must not be refused** — declining to save approved drafts is as much a
+contract failure as writing them unasked (a genuinely denied Write
+permission is a degrade, not a refusal).
+
 ## Redaction checklist (before anything persists)
+
+For present-for-review flows (mine, capture batch), redaction runs
+**before the drafts render** — the rendered fenced content is already
+redacted, byte-for-byte what a go-ahead writes; redacting between render
+and write would silently break that equality, and rendering unredacted
+content re-broadcasts it in-session.
 
 Scan every draft and strip or abort on:
 - credentials, tokens, API keys, secrets;
@@ -257,8 +315,12 @@ Scan every draft and strip or abort on:
 - PII (names+contact tied to individuals, customer data);
 - negative comments about named people.
 
-**Ticket/tracker text** (from `/lore:mine`'s ticket source) additionally
-requires stripping — not just "negative comments about named people":
+**Ticket/tracker text** — a co-reference ticket ID, or ticket content
+**quoted inside commit messages, PR bodies, or session text** a user pasted
+in (`/lore:mine` does not fetch ticket bodies, but git/PR text can quote
+ticket content and `/lore:capture` batch mode can meet pasted ticket text) —
+additionally requires stripping, not just "negative comments about named
+people":
 - assignee / reporter / commenter names;
 - status-change politics;
 - team-vs-team escalation narrative.
