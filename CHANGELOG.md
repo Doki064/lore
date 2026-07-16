@@ -7,6 +7,74 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-16
+
+Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
+zero data-model field additions. Theme: **earned claims and gated writes**,
+finishing the structural-honesty pass v0.4 began. The field showed every
+surface that never got a pinned output shape still narrating unconsulted
+sources, one model auto-writing drafts past the consent gate, and one model
+rendering a `+ N docs spot-checked` assurance its own run hadn't earned. Scope
+driven by the v0.4 dogfood watchlist plus field probes (anonymized: no
+org/repo/ticket/person identifiers) on a real enterprise dbt monorepo with a
+Rally-class tracker and two real local repos. Verified with hostile
+prompt-review before tagging and live two-model smokes on final bytes.
+
+### Added
+- `/lore:mine` **write gate**: no `Write`/`Edit` of any `.lore/` path from run
+  start until the user's explicit go-ahead after the part-5 present-for-review
+  ask has rendered; a save instruction given *before* part 5 is not the
+  go-ahead. The gate **defers** the write, never forbids it — the same-session
+  approved write is legal and must not be refused. Part 3 becomes "Drafts
+  (rendered, not written)"; part 5 names the two paths (go-ahead now / promote
+  later via `/lore:verify` or PR), and over-cap leftovers vs. "considered, not
+  drafted" render by whether the cap was actually exceeded.
+- `/lore:verify`: its first pinned **render skeleton** — sweep items,
+  sweep-counts line, pending-decision asks, then a separate outcome-counts
+  line; empty categories are omitted, never rendered as a "0" line. The
+  interactive re-confirm/update/retire/promote drive loop is untouched.
+- `/lore:onboard`: pinned **render skeletons** for both scoped and overview
+  modes (a rendering pin of the existing step semantics — tripwires first, no
+  step dropped), plus a **getting-hands-on** overview tail: an optional final
+  part of ≤5 cited entry-point artifacts (manifest/CI/Make-class files, the
+  tests directory, the docs index) under the fixed frame "entry points (cited;
+  unverified as a sequence)" — noun-phrase pointers only, no invented commands,
+  no advice or difficulty judgments; no citable artifacts ⇒ no part.
+- `/lore:ask`: a **confinement clause** — step-shaped output (unknowns routing,
+  dispute footnotes, DOC DRIFT flags, doc receipts) renders only as flag lines
+  after the answer body, one per line; a step that found nothing gets no line
+  anywhere.
+
+### Changed
+- **Earned-claim guard** (`/lore:onboard` + the `using-lore` skill): a claim of
+  work renders only with its receipts. `+ N docs spot-checked` renders iff the
+  risk-flags slot carries a per-doc receipt line — the doc plus the concrete
+  claim/symbol grain actually checked, either "aligned" or a `DOC DRIFT` line —
+  reader-falsifiable; no receipts ⇒ no term. who-to-ask is now **two-state** (a
+  git-author path, or a CODEOWNERS-fallback path that states its trigger); no
+  third state names an unconsulted source.
+- **`/lore:verify` summary split into two count lines** by when their facts
+  exist: sweep counts (fresh / stale / disputed / never-verified /
+  retire-candidates / still-draft) at sweep time, outcome counts (re-confirmed
+  / updated / retired / promoted / disputed-resolved / stale-disputes) only
+  after the step 2–4 decisions — a session that ends before them omits the
+  outcome line rather than render zeros the loop didn't produce.
+- **Ticket source demoted from active mining** (`/lore:mine`): mine performs no
+  tracker queries and no project discovery, tracker tool present or not (the
+  v0.3 conditional ticket-tracker source is removed). Ticket IDs enter a note
+  only as bare co-references quoted in a commit message or PR body
+  (`(also referenced by <TICKET-ID>)`) — the fold relocated onto git history
+  (source 1). The ticket/tracker redaction clause stays in the skill:
+  `/lore:capture` can meet pasted ticket text, and commit/PR text can quote
+  ticket content with names.
+
+### Fixed
+- Hostile prompt-review before tagging caught a fabricated-counts bug in the
+  new `/lore:verify` skeleton (H1): outcome counts placed at sweep time would
+  have rendered as zeros the decision loop hadn't yet produced — moved to their
+  own line after the decision asks, omitted entirely when the session ends
+  first.
+
 ## [0.4.0] - 2026-07-15
 
 Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,

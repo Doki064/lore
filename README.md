@@ -37,7 +37,7 @@ walkthrough.
 | `/lore:capture` | Draft a note from the current session; dedup, anchor lint, redaction, then confirmed-or-draft by the trust rule. Under 10 seconds of human time. |
 | **tripwire gate** (hook) | Editing a file guarded by a confirmed tripwire? The first edit attempt is stopped once, with the warning as the reason; the immediate retry passes. Once per note per session; stale notes re-alert once, labeled. |
 | `/lore:ask` | Grounded Q&A: answers from lore + code + git history, every claim cited, drafts and stale notes labeled, routes to a human when it doesn't know. |
-| `/lore:mine` | Cold start: seed draft notes from reverts, incident commits, PR review threads (via `gh`), ADRs, CODEOWNERS — and, when the session has a ticket-tracker tool (Jira/Rally via MCP), incident/decision tickets too (silent when absent). |
+| `/lore:mine` | Cold start: seed draft notes from reverts, incident commits, PR review threads (via `gh`), ADRs, CODEOWNERS. Drafts are rendered as exact file content and written only on your go-ahead; ticket IDs appear only as bare co-references quoted from commit/PR text (mine runs no tracker queries). |
 | `/lore:verify` | Staleness sweep: re-confirm / update / retire notes whose anchors changed; promote vetted drafts. |
 | `/lore:onboard` | New joiner: a brief scoped to the ticket in front of you — tripwires first, decision history, who to ask. Not a wiki tour. |
 | `/lore:offboard` | Departing engineer: bus-factor scan finds their monopolies, then an in-context interview drafts the notes before the knowledge walks out. |
@@ -107,6 +107,44 @@ doc. `/lore:verify` gains a **never-verified** sweep category for notes
 that have no `verified_sha` baseline at all (legacy or hand-written notes),
 distinct from both fresh and stale.
 
+## What's new in v0.5
+
+Prompt/docs-level only — no runtime or hook changes. Theme: **earned claims
+and gated writes** — every surface that never received an output shape had
+regressed into narrating work it didn't do, and one model auto-wrote drafts
+past the consent gate. Five changes, each receipt-backed by field evidence:
+- `/lore:mine` gains a **write gate**: it renders every draft as exact file
+  content and calls no `Write`/`Edit` on any `.lore/` path until your explicit
+  go-ahead after the closing present-for-review ask. The gate defers the write,
+  it doesn't forbid it — the same-session approved write is legal and never
+  refused. Part 3 is now "Drafts (rendered, not written)"; the closing names
+  the two real paths (go-ahead now / promote later via `/lore:verify` or PR).
+- **Earned-claim guard** in `/lore:onboard` and the skill: a claim of work
+  renders only with its receipts. `+ N docs spot-checked` appears only when the
+  risk-flags slot carries a per-doc receipt line — the doc plus the exact
+  claim/symbol checked, either "aligned" or a `DOC DRIFT` line — and who-to-ask
+  is **two-state** (a git-author path, or a CODEOWNERS-fallback path that states
+  its trigger), with no third state that names an unconsulted source.
+- **Pinned render skeletons** for the surfaces that never had one: `/lore:verify`
+  gets its first (sweep counts rendered at sweep time; outcome counts only after
+  the promote/dispute decisions are made — never zeros the loop didn't produce);
+  `/lore:onboard`'s scoped and overview modes get a rendering pin of their
+  existing steps (tripwires still first); and `/lore:ask` gains a confinement
+  clause keeping step-shaped output (unknowns routing, dispute footnotes,
+  DOC DRIFT, doc receipts) to flag lines after the answer body.
+- **Ticket source demoted from active mining**: `/lore:mine` runs no tracker
+  queries and no project discovery, tracker tool present or not. Ticket IDs
+  reach a note only as bare co-references quoted in a commit message or PR body
+  (`(also referenced by <TICKET-ID>)`) — the fold relocated onto git history,
+  where the IDs actually arrive. The ticket/tracker redaction pass stays, since
+  `/lore:capture` and PR/commit text can still carry ticket content.
+- **Getting-hands-on tail** on the onboard overview: an optional final part
+  listing ≤5 cited entry-point artifacts (build/test/run files from the
+  manifest/CI/Make-class tree, where tests live, the docs index) under a fixed
+  "entry points (cited; unverified as a sequence)" frame — noun-phrase pointers
+  only, no invented commands, no advice or difficulty judgments. No citable
+  artifacts ⇒ no part.
+
 ## Locked-down environments
 
 lore's commands read `git`/`gh` at runtime — that's how citations, blame,
@@ -147,22 +185,26 @@ never fresh.
 
 ## Status
 
-v0.4.0 — prompt/docs-level release on top of the v0.2 runtime (no hook or
-test changes since v0.2; the hook suite is a regression guard only). v0.2's
-live verification stands: hook test suite green twice in a row
-(`tests/hook_test.js`, 13 asserts), plugin-validator PASS, and the v0.2
-surfaces exercised in real `claude -p` sessions: the session-start awareness
-line reaching model context with correct counts, a disputed tripwire denying
-once with the dispute footnoted (never reframed) then passing on retry, and
-mining-first `/lore:onboard` producing a cited, zero-write brief on a repo
-that had never seen lore. v0.4's surfaces were live-smoked on final bytes
-across **two models** (11 fresh `claude -p` runs, sonnet + opus): the pinned
-mine skeleton with zero absent-source mentions, the ticket co-reference fold
-and its negative case, categories-and-counts redaction reporting, all three
-coverage-header provenance variants, DOC DRIFT firing with fixed wording,
-and verify's never-verified category.
+v0.5.0 — prompt/docs-level release on top of the v0.2 runtime (no hook or
+test changes since v0.2; the hook suite is a regression guard only, green
+twice in a row). v0.2's live verification stands: hook test suite green twice
+in a row (`tests/hook_test.js`, 13 asserts), plugin-validator PASS, and the
+v0.2 surfaces exercised in real `claude -p` sessions: the session-start
+awareness line reaching model context with correct counts, a disputed
+tripwire denying once with the dispute footnoted (never reframed) then passing
+on retry, and mining-first `/lore:onboard` producing a cited, zero-write brief
+on a repo that had never seen lore. v0.5's newly-pinned surfaces were
+live-smoked on final bytes across **two models** (sonnet + a larger model):
+mine's write gate (no `.lore/` file written before the go-ahead; the approved
+write then landing byte-for-byte the rendered content), the earned-claim guard
+(`+ N docs spot-checked` present only with its per-doc receipts, DOC DRIFT
+still firing on seeded drift), two-state who-to-ask, verify's split
+sweep/outcome counts, and the onboard getting-hands-on tail. A hostile
+prompt-review before tagging caught a fabricated-counts bug in the verify
+skeleton (outcome counts must render only after the decisions, never as
+sweep-time zeros).
 
 Design provenance: each milestone converged from structured debates between
 simulated new-joiner and senior panels, hardened through adversarial review
 (implementer cold-reads + product red-teams), built under gatekept phase
-reviews — see [docs/plans/V04-PLAN.md](docs/plans/V04-PLAN.md). Scope is deliberately single-repo.
+reviews — see [docs/plans/V05-PLAN.md](docs/plans/V05-PLAN.md). Scope is deliberately single-repo.

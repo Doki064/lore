@@ -20,14 +20,15 @@ In a Claude Code session inside `payments/`:
 ```
 
 Claude scans git history (reverts, incident/hotfix commits), merged-PR
-review threads (when `gh` is available), ADR directories, CODEOWNERS, and —
-only when the session actually has a ticket-tracker tool (Jira/Rally via
-MCP) — incident/decision tickets. A source whose precondition doesn't hold
-this session is never named — no "skipped" line, no ticket ever mentioned
-without the tool. The report is a fixed five-part shape: what the floor
-found, findings from whichever conditional sources actually ran, every
-draft shown as the exact file content it would write, a redaction line,
-then the write-or-not ask.
+review threads (when `gh` is available), ADR directories, and CODEOWNERS. A
+source whose precondition doesn't hold this session is never named — no
+"skipped" line. mine runs no tracker queries and no project discovery: a
+ticket ID reaches a note only when a commit message or PR body **quotes** it,
+recorded there as a bare co-reference. The report is a fixed five-part shape:
+what the floor found, findings from whichever conditional sources actually
+ran, the drafts **rendered (not written)** as the exact file content they
+would persist, a redaction line, then the closing present-for-review ask.
+Nothing lands in `.lore/` until you give the go-ahead.
 
 > **Floor.** Source 1 — git history (exhaustive): 1 revert, 1 hotfix
 > commit. Source 3 — ADR presence: none (`docs/adr/` has only
@@ -35,6 +36,8 @@ then the write-or-not ask.
 >
 > **Source 2 — PR review threads (`gh` present):** one candidate, a
 > reviewer comment on the merged PR touching `src/refunds/vendor.py`.
+>
+> **Drafts (rendered, not written).**
 
 ```markdown
 # .lore/tripwire-billing-export-revert.md
@@ -42,7 +45,7 @@ then the write-or-not ask.
 kind: tripwire
 anchors:
   - src/billing/export.py
-source: commit a1b2c3d
+source: commit a1b2c3d (also referenced by BILL-419)
 verified_sha: 9f1c4e2
 verified_date: 2026-07-15
 status: draft
@@ -69,13 +72,19 @@ the same limit independently.
 
 > redaction pass: nothing to strip
 >
-> Write these to `.lore/` as drafts?
+> Two ways to keep these: **go-ahead now** and mine writes exactly the
+> rendered content, or **promote later** via `/lore:verify` or PR review.
+> Write these to `.lore/` now?
 
-Nothing is written without your go-ahead, and nothing mined is ever
-auto-confirmed. Note the shape: `verified_sha`/`verified_date` on a draft
-are the **drafting baseline** — the commit checked, not a human
-confirmation — and every candidate is phrased as what happened, never as
-what "the team decided."
+Nothing is written until you say go — mine renders the drafts, it doesn't
+persist them, and no `Write`/`Edit` touches `.lore/` before your reply here.
+The approved write is legal, just deferred: on go-ahead each file lands
+byte-for-byte the block above. Note the shape: `verified_sha`/`verified_date`
+on a draft are the **drafting baseline** — the commit checked, not a human
+confirmation — every candidate is phrased as what happened, never as what
+"the team decided," and the `(also referenced by BILL-419)` co-reference
+means only that commit `a1b2c3d`'s message quoted that ticket: mine ran no
+tracker query and never claims the ticket corroborates the note.
 
 ## 2. Capture a tripwire the moment it comes up
 
@@ -256,9 +265,14 @@ and a hand-written `glossary` note predating `verified_sha` tracking has no
 baseline commit at all — a **never-verified** category, distinct from both
 fresh and stale, rendered as "no baseline — never verified against any
 commit." Jane confirms it's still accurate and stamps its first
-`verified_sha`. The summary counts it all: fresh / re-confirmed / promoted
-/ still-draft, disputed-resolved, stale-disputes, retire-candidates,
-never-verified.
+`verified_sha`. The summary comes in two lines, split by when their facts
+exist: a **sweep-counts** line known before any decision (fresh / stale /
+disputed / never-verified / retire-candidates / still-draft), and — only
+after the decisions above are made — an **outcome-counts** line (re-confirmed
+/ updated / retired / promoted / disputed-resolved / stale-disputes),
+counting only decisions actually made this session. A sweep that ends before
+the asks are answered renders the sweep line alone; the outcome line is never
+shown as zeros the loop didn't produce.
 
 ## 7. People flows
 
