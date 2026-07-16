@@ -77,9 +77,39 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
    co-reference, show the **full `source:` line** as part of what the owner
    confirms.
 
-5. **Summarize.** Report counts: fresh / re-confirmed / updated / retired /
-   promoted / still-draft, plus disputed-resolved (disputes cleared or
-   retired in step 2), stale-disputes (disputes flagged >90 days old in step
-   2), retire-candidates (notes flagged in step 1, whether or not the user
-   retired them), and never-verified (notes missing `verified_sha`, whether
-   or not the user confirmed them).
+5. **Summarize — two count lines, split by when their facts exist.**
+   **Sweep counts** (known at sweep time, before any decision): fresh /
+   stale / disputed / never-verified (notes missing `verified_sha`) /
+   retire-candidates (notes flagged in step 1) / still-draft.
+   **Outcome counts** (they exist only AFTER the step 2–4 decisions):
+   re-confirmed / updated / retired / promoted / disputed-resolved /
+   stale-disputes (>90 days, flagged in step 2) — counting only decisions
+   actually made this session. If the session ends with the decision asks
+   unanswered, the outcome line is **omitted** — never rendered as zeros the
+   loop didn't produce.
+
+## Output — pinned render skeleton (structure only)
+
+This governs OUTPUT STRUCTURE only; the sweep order above (disputed → stale →
+draft promotion) and the re-confirm/update/retire/promote decision loop are
+**untouched**. What you render is exactly these parts, in order:
+
+1. **Sweep items.** The per-note one-liners from step 1, grouped by category
+   (fresh / stale / disputed / never-verified / retire-candidate, per the
+   definitions above). **Only categories with members render** — an empty
+   category is omitted, never shown as a "0" line or narrated.
+2. **Sweep counts line.** The step-5 sweep-counts format — facts known at
+   sweep time. The only aggregate statement rendered at this point; no prose
+   restatement of an aggregate (e.g. "nothing is stale") appears anywhere.
+3. **Pending-decision asks.** The step 2–4 promotion/dispute questions,
+   verbatim-fact + qualification-basis form unchanged. The qualification
+   basis (e.g. "no CODEOWNERS; sole committer on the anchors") stays
+   **REQUIRED** — it is the promotion gate's receipt (the skill's earned-claim
+   principle), NOT absent-source narration; a future editor must not strip it.
+4. **Outcome counts line** — step-5's outcome counts, rendered **only after
+   the part-3 decisions have been answered** and counting only decisions
+   actually made this session; a session that ends before the decisions
+   omits this line entirely (zeros the loop didn't produce are fabrication,
+   not reporting).
+5. Nothing else — no preamble, no closing advice, no compliance narration.
+   Observations outside the sweep (e.g. repo hygiene) have no slot.

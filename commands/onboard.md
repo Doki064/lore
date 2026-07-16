@@ -17,7 +17,10 @@ skill's coverage-header rule and flip together: git executed → `+ git
 history`; git attempted-and-denied → the degrade substitution; git never
 attempted → `+ tree+notes (git history not needed for this answer)`. When
 doc-drift spot-checks ran on docs the brief cites, the header also gains
-`+ N docs spot-checked`. If no note anywhere in `.lore/` anchors into the
+`+ N docs spot-checked` — but **only** when the risk-flags slot carries the
+per-doc receipt lines that earn it (the doc-drift instruction below; the
+skill's earned-claim rule): no receipt lines ⇒ no term. If no note anywhere
+in `.lore/` anchors into the
 scoped paths, say so plainly instead of bottoming out silently, with the
 attempt-matched empty-state phrase — git executed: "no lore captured for
 this area yet — everything below is live-derived from git"; git never
@@ -30,8 +33,32 @@ note's `disputed:` line. Whenever the brief cites or quotes a human doc as
 the source for a claim about code, spot-check that claim against the current
 tree first (the skill's doc-drift rule); on a grep-verifiable divergence emit
 `DOC DRIFT — <doc path> references <thing>, not found in current tree
-(<citation>); verify with an owner.` — only for docs the brief actually
-relies on, never a repo-wide doc audit.
+(<citation>); verify with an owner.` **Every doc you spot-check emits exactly
+one receipt line in the risk-flags slot** — that DOC DRIFT line on a
+divergence, otherwise the aligned receipt
+`<doc path> — checked <claim → tree target> — aligned` (the skill's
+one-receipt-per-doc rule); N receipt lines ⇔ the `+ N docs spot-checked`
+term. Only for docs the brief actually relies on, never a repo-wide doc
+audit.
+
+**Render skeleton (scoped mode).** A rendering pin of steps 1–7 — no step's
+semantics change, no step is dropped, tripwires stay first. Step 1 routes (to
+this scoped path or to Overview mode) and is **not a slot**. In scoped mode,
+render exactly these slots in order; a slot with nothing to render is
+**omitted entirely** — there is no preamble slot, and no completeness language
+anywhere:
+- **Coverage header** — the header above.
+- **Tripwires + risk flags** — step 2 (tripwires FIRST and prominent), then
+  staleness labels, DOC DRIFT lines, and the per-doc receipt lines.
+- **Brief body** — steps 3 and 5 (relevant notes + live decision history),
+  citations inline.
+- **Who to ask** — step 6, in the two-state shape below.
+- **Gaps** — step 4's mining-first candidates, under the unconfirmed-guesses
+  frame. Present **iff step 4 fired**; never rendered to say coverage was
+  sufficient ("Gaps: none" is banned prose).
+Step 7's closing offers render after the skeleton. The step-4/step-5 de-dup
+(decision history does not re-list mining candidates) still holds across the
+brief-body and gaps slots.
 
 1. **Resolve the scope — and pick the mode.** If `$ARGUMENTS` (or, when you
    asked what they'll work on, their answer) is an **explicit
@@ -76,10 +103,21 @@ relies on, never a repo-wide doc audit.
    starting this ticket needs. If step 4 fired, skip any commit already
    listed there.
 
-6. **Who to ask.** Recent blame authors of the scoped paths
-   (`git log --format='%an <%ae>' -- <path>` on the recent history). If the
-   last author hasn't committed in >6 months or is absent from the repo's
-   recent log, fall back to CODEOWNERS for those paths.
+6. **Who to ask — two-state; never name a source you did not consult.**
+   - *Git-author path:* author line(s) only — name, recency, paths touched —
+     from `git log --format='%an <%ae>' -- <path>` on the recent history.
+     The words "CODEOWNERS" and "fallback" **must not appear** in this state
+     ("no fallback was needed" is banned prose); the state renders author
+     lines and nothing else.
+   - *Fallback path:* only when the last author hasn't committed in >6 months
+     or is absent from the recent log, consult CODEOWNERS **because** the
+     author signal was stale/absent, stating that trigger; then report what
+     the consultation found — the owning entry for those paths, or that
+     CODEOWNERS holds no ownership record for them (that finding is the
+     receipt). There is no third state that names an unconsulted source.
+     If git itself is blocked or denied, neither state fires — who-to-ask
+     degrades per the skill's permission-walls rule; git-unavailability is
+     **never** read as a stale/absent author signal.
 
 7. **Close.** Keep the whole brief short; cite every claim (path:line, sha,
    or note filename) per the skill. End by offering `/lore:ask` for
@@ -99,7 +137,11 @@ within a section, but do not invent new top-level sections:
    "commit/PR X migrated Y (citation)" — and **never** assert per-component
    completeness, percentages, or a migrated/not-migrated status verdict.
    State absence of evidence as "no migration evidence found in this repo for
-   Z", never as "Z is legacy". Give trade-offs only when a human wrote them
+   Z", never as "Z is legacy" — and only for a **specific Z whose
+   legacy-vs-current split is actually visible in the repo**, never as a
+   roster of things not found and never as a blanket "no migration evidence
+   in this repo" with no Z. Never narrate the omission itself ("omitted
+   rather than guessed at" is banned prose — an empty section is silent). Give trade-offs only when a human wrote them
    somewhere citable (quote + cite).
 3. **Docs map.** Entry-point human docs, each **named + cited** with a
    one-line description — names and cites, does not reproduce or explain their
@@ -108,6 +150,34 @@ within a section, but do not invent new top-level sections:
    relies on and cites.
 4. **Tripwires + relevant notes** — steps 2–3 above, whole-repo.
 5. **Decision history + who to ask** — steps 5–6 above, whole-repo.
+6. **Getting hands-on (optional) — entry points (cited; unverified as a
+   sequence).** Renders **only** when the tree holds at least one
+   manifest/CI/Make-class file, a tests directory, or a docs index — plain
+   source files never qualify as entry points and never earn this part. At
+   most 5 lines, each a **noun-phrase pointer** (no leading verb) to such an
+   artifact verified present in the tree, each with its citation. A command
+   string may appear only **quoted verbatim from one of those files** —
+   never composed by you ("`python main.py`" invented from a source file is
+   the banned case). A line is the artifact name + citation +
+   at most a neutral ≤6-word descriptor of what the artifact **is**; no
+   evaluative, sequencing, or priority words **anywhere in the line** (no
+   "start here", "worth running first"). No invented commands, no "safe first
+   change", no completeness or difficulty judgments: these are places to
+   open, not steps to follow. No qualifying artifacts ⇒ this part is omitted
+   and its absence is not narrated — never name the artifact classes that
+   are missing ("no test suite, CI config, or manifest exists" is banned
+   prose).
+
+After the last rendered section, **one closing line** offering `/lore:ask`
+(and `/lore:mine` when `.lore/` is empty) may render — a pointer, not a
+recap; nothing else renders after it.
+
+**Workflow labels are verbatim and cited.** Where the overview organizes the
+repo by its workflows or pipelines, group around the repo's OWN evidenced
+workflows — every workflow label must be a **verbatim artifact name from the
+tree** (a CI job name, a Make/npm-script target, a pipeline/model directory
+name), with the naming artifact cited. Synthesized or renamed groupings are
+banned: group only what the repo itself already names.
 
 When `.lore/` is empty or has fewer than 3 notes repo-wide, the mining
 fallback (step 4 above, exhaustive-and-reported) still applies but is

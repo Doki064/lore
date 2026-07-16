@@ -39,10 +39,23 @@ git history.
    current tree (<citation>); verify with an owner.` — only for docs the
    answer actually uses, never a repo-wide doc audit.
 
+   **Confinement.** Keep the answer freeform, but anything step-shaped —
+   unknowns routing, dispute footnotes, DOC DRIFT flags, and doc receipts —
+   appears **only as flag lines in a flags position after the answer body**,
+   one line each. A step that found nothing gets **no line anywhere**,
+   including inside the answer prose — never a "searched and found nothing"
+   sentence. The per-doc receipts render as those flag lines (one per
+   spot-checked doc: the DOC DRIFT line, else
+   `<doc path> — checked <claim → tree target> — aligned`, the skill's
+   one-receipt-per-doc rule), and the `+ N docs spot-checked` header term
+   renders iff they are present.
+
 3. **Unknown.** If lore and the repo do not answer it, say "I don't know" and
    route the asker to a human: recent blame authors of the relevant paths,
    falling back to CODEOWNERS when the last author has not committed in >6
-   months or is absent from the recent log.
+   months or is absent from the recent log. If git itself is blocked or
+   denied, routing degrades per the skill's permission-walls rule —
+   git-unavailability is never read as a stale/absent author signal.
 
 4. **Close the loop.** If you just resolved something that was previously
    unknown, offer `/lore:capture` so the answer is only worked out once.
