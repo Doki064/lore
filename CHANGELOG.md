@@ -2,8 +2,7 @@
 
 All notable changes to the lore plugin. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
-[SemVer](https://semver.org/). Each version's frozen design plan lives at
-`docs/plans/VXX-PLAN.md`.
+[SemVer](https://semver.org/).
 
 ## [Unreleased]
 
@@ -51,8 +50,8 @@ green twice in a row (hooks/tests untouched since v0.2).
   non-empty findings list** — zero items ⇒ no line, no heading, no sentence;
   sentence-form empty states ("none found", "no X this sweep", "all N verified
   — none stale") are structurally out, replacing the per-phrase bans they
-  generalize. An enumerated **mandated-attestation exception list** (frozen in
-  the plan, swept against the skill + ask/onboard/mine/verify) keeps every line
+  generalize. An enumerated **mandated-attestation exception list** (frozen at
+  release, swept against the skill + ask/onboard/mine/verify) keeps every line
   a reader is genuinely owed — coverage-header empty states, the
   permission-degrade one-liner, the redaction report including its "nothing to
   strip" form, mine's floor "none", who-to-ask's CODEOWNERS-fallback trigger

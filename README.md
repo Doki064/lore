@@ -103,14 +103,7 @@ chasing a permissions fix that won't land:
 In both cases lore degrades the same way: one line naming what's blocked,
 then tree+notes only.
 
-## Design & history
+## Docs
 
 - **[CHANGELOG.md](CHANGELOG.md)** — what changed in each version.
-- **[docs/plans/](docs/plans/)** — one frozen design plan per version; the
-  newest shipped `VXX-PLAN.md` is the canonical full design (data model,
-  component specs, review history, build phases).
 - **[docs/EXAMPLE.md](docs/EXAMPLE.md)** — end-to-end usage walkthrough.
-- **[docs/HANDOFF.md](docs/HANDOFF.md)** — pickup notes for the next milestone.
-
-Each milestone converged from structured new-joiner/senior panel debates,
-hardened through adversarial review, and built under gatekept phase reviews.
