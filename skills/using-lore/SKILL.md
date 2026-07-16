@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.5.0
+version: 0.6.0
 ---
 
 # Using lore
@@ -106,8 +106,11 @@ Every answer and every brief opens with one line:
 `+ git history`). N/M
 count by `status:`; J is an **overlay count** of notes (of either status)
 carrying a `disputed:` line — never a third status bucket. Counts are
-scoped to what the answer actually used. Empty is stated, never silently
-omitted.
+**citation-derived**: N/M count the notes the answer or brief actually
+**cites in its body by filename** — a note read while gathering but not cited
+earns no count, so the header can never claim a note the body does not use;
+J is the disputed overlay of those cited notes. Empty is stated, never
+silently omitted.
 
 **The provenance term and the zero-note empty-state phrase are
 attempt-based** — they flip **together**, and neither ever claims grounding
@@ -197,6 +200,35 @@ narration and are never suppressed by this rule:
   lines exist **only for doc spot-checks** — no other check class (a git
   lookup, a grep, tool presence) earns one; a clean non-doc check renders
   nothing.
+
+## List-first rendering
+
+Every slot in a pinned skeleton — an onboard section, an ask flags line, a
+verify sweep part, a mine part — renders **only by iterating a non-empty
+findings list**. Zero items ⇒ **no heading, no line, no sentence**: an empty
+slot is silent, never a placeholder and never a sentence about its own
+emptiness. Prose may not state a count or an absence that the findings list
+itself does not carry. Sentence-form empty states are the banned class — "none
+found", "no disputed notes this sweep", "all N verified — none stale", "no
+fallback was needed", "Gaps: none", "omitted rather than guessed at" are
+illustrations of the shape, not the rule; the rule is the structure, so a
+reworded paraphrase is banned for the same reason. Findings-with-citations —
+mine drop notes, doc-drift receipt lines — **are** list members and render by
+this rule itself; they are not empty-state.
+
+**Mandated attestations are exempt.** A line a command explicitly mandates is
+NOT empty-state prose and this rule never suppresses it, even when it carries
+an absence or a zero. The exempt set: the coverage/provenance header (its
+attempt-based term and zero-note empty-state phrases); the permission-degrade
+line; the redaction report, including its `nothing to strip` form;
+`/lore:mine`'s floor found-or-none ("none"); `/lore:onboard` who-to-ask's
+CODEOWNERS-fallback trigger statement and its "no ownership record" finding;
+onboard orientation's "no migration evidence found in this repo for Z" line
+(only for a specific visible Z); and `/lore:verify`'s sweep-counts line, its
+outcome-counts line (after the decisions run), and its per-note
+qualification-basis line. These are attestations a reader is owed; render them
+under their own conditions. Anything NOT on this list and NOT backed by a
+findings list does not render.
 
 ## Doc drift (`/lore:onboard` + `/lore:ask`)
 
