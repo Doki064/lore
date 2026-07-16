@@ -19,6 +19,16 @@ is **legal and must not be refused** — declining to save approved drafts is
 as much a contract failure as writing them unasked (a genuinely denied Write
 permission is a degrade, not a refusal).
 
+**First byte.** Mine's rendered output begins at part 1's literal heading
+`1. Floor report.` — byte one. Nothing renders before it: no acknowledgment of
+instructions, no environment or index remarks, no meta comment (including a
+"no preamble" remark — a no-preamble note is itself a preamble), and no
+repo-summary sentence ("Only 3 commits total, all on `main`, no tags, no
+reverts" is the banned shape — those facts belong INSIDE part 1 as floor
+findings). This holds on any repo size, any degrade state. Anything the
+run must flag (a suspicious index, a degrade, a stale-tool caveat) renders
+inside its owning part's slot, never before part 1.
+
 The deterministic signal floor — reverts plus incident/fix/workaround/
 hotfix-keyed commits on still-existing files (source 1), and ADR presence
 (source 3) — is applied **exhaustively and reported** (what was found, or an

@@ -12,9 +12,13 @@ git history.
    read the matches.
 
 2. **Answer.** Open with the coverage header: `grounded in: N confirmed + M
-   draft notes (J disputed)` followed by the provenance term — N/M count by
-   `status:` among the notes actually used, J is an overlay count of those
-   (either status) carrying a `disputed:` line. The provenance term and the
+   draft notes (J disputed)` followed by the provenance term — N/M count, by
+   `status:`, the notes the answer body **cites by filename** (a note read in
+   step 1 but not cited earns no count), J is the disputed overlay of those
+   cited notes (either status carrying a `disputed:` line); all three derive
+   from the composed body's own citation set, not recalled — compose the body
+   first, then derive the counts and emit the header above it. The provenance
+   term and the
    zero-note empty-state phrase are **attempt-based** per the skill's
    coverage-header rule and flip together: git executed → `+ git history`;
    git attempted-and-denied → the degrade substitution; git never attempted →
@@ -44,11 +48,23 @@ git history.
    appears **only as flag lines in a flags position after the answer body**,
    one line each. A step that found nothing gets **no line anywhere**,
    including inside the answer prose — never a "searched and found nothing"
-   sentence. The per-doc receipts render as those flag lines (one per
-   spot-checked doc: the DOC DRIFT line, else
-   `<doc path> — checked <claim → tree target> — aligned`, the skill's
-   one-receipt-per-doc rule), and the `+ N docs spot-checked` header term
-   renders iff they are present.
+   sentence. A doc cited or quoted as the source for a claim **about code** is
+   spot-checked (the skill's code-claim test); each spot-check performed
+   renders exactly **one** receipt flag line — the DOC DRIFT line on a
+   divergence, else `<doc path> — checked <claim → tree target> — aligned`
+   (the skill's one-receipt-per-doc rule). A doc mentioned without sourcing a
+   code claim earns neither spot-check nor receipt. The `+ N docs spot-checked`
+   header term's N **equals the number of receipt lines rendered** (derived,
+   not recalled), and it renders iff at least one is present.
+
+   **Terminal pin.** After the flags position, only the step-4 capture offer
+   and the step-5 dispute-raise offer below may render — each unchanged and
+   only in its shipped condition; nothing else renders after the flags. That
+   includes methodology asides: a parenthetical about how the answer was
+   derived ("*(git history isn't the crux here — the answer is grep- and
+   tree-derived)*" is the banned shape) renders nowhere — not after the
+   flags, not in the body; the header's provenance term already carries the
+   sourcing.
 
 3. **Unknown.** If lore and the repo do not answer it, say "I don't know" and
    route the asker to a human: recent blame authors of the relevant paths,
