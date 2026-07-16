@@ -21,14 +21,15 @@ In a Claude Code session inside `payments/`:
 
 Claude scans git history (reverts, incident/hotfix commits), merged-PR
 review threads (when `gh` is available), ADR directories, and CODEOWNERS. A
-source whose precondition doesn't hold this session is never named — no
-"skipped" line. mine runs no tracker queries and no project discovery: a
-ticket ID reaches a note only when a commit message or PR body **quotes** it,
-recorded there as a bare co-reference. The report is a fixed five-part shape:
-what the floor found, findings from whichever conditional sources actually
-ran, the drafts **rendered (not written)** as the exact file content they
-would persist, a redaction line, then the closing present-for-review ask.
-Nothing lands in `.lore/` until you give the go-ahead.
+source that isn't available this session is simply never mentioned — no
+"skipped" line. Mine also never queries a ticket tracker: a ticket ID
+reaches a note only when a commit message or PR body **quotes** it.
+
+The report is a fixed five-part shape: what the deterministic floor found,
+findings from whichever conditional sources actually ran, the drafts
+**rendered (not written)** as the exact file content they would persist, a
+redaction line, then the closing present-for-review ask. Nothing lands in
+`.lore/` until you give the go-ahead.
 
 > **Floor.** Source 1 — git history (exhaustive): 1 revert, 1 hotfix
 > commit. Source 3 — ADR presence: none (`docs/adr/` has only
@@ -77,14 +78,17 @@ the same limit independently.
 > Write these to `.lore/` now?
 
 Nothing is written until you say go — mine renders the drafts, it doesn't
-persist them, and no `Write`/`Edit` touches `.lore/` before your reply here.
-The approved write is legal, just deferred: on go-ahead each file lands
-byte-for-byte the block above. Note the shape: `verified_sha`/`verified_date`
-on a draft are the **drafting baseline** — the commit checked, not a human
-confirmation — every candidate is phrased as what happened, never as what
-"the team decided," and the `(also referenced by BILL-419)` co-reference
-means only that commit `a1b2c3d`'s message quoted that ticket: mine ran no
-tracker query and never claims the ticket corroborates the note.
+persist them. On go-ahead, each file lands byte-for-byte as the block above.
+
+Three things worth noticing in the drafts themselves:
+
+- `verified_sha`/`verified_date` on a draft are the **drafting baseline** —
+  the commit the fact was checked against, not a human confirmation.
+- Every candidate is phrased as what happened, never as what "the team
+  decided."
+- The `(also referenced by BILL-419)` co-reference means only that commit
+  `a1b2c3d`'s message quoted that ticket. Mine ran no tracker query and
+  never claims the ticket corroborates the note.
 
 ## 2. Capture a tripwire the moment it comes up
 
@@ -220,14 +224,16 @@ bug was fixed in PR #700, months after the note was confirmed:
 
 Claude adds one line to the note's frontmatter — `disputed: PR #700 (merged
 2026-06-01) fixed the vendor rounding bug; *2 may no longer be needed` — and
-nothing else. `status:` stays `confirmed`, the body stays untouched, and the
-tripwire keeps firing: the next edit to `src/pay.py` still shows the full
-warning, with the hook's author-free footnote appended —
-`(Unresolved reader dispute on file — not owner-verified: "PR #700 (merged
-2026-06-01) fixed the vendor rounding bug; *2 may no longer be needed". An
-owner resolves it via /lore:verify.)` — the warning itself is never
-reframed. In `/lore:ask`, `/lore:onboard`, and `/lore:verify`, the same
-dispute renders with its author and age read live from git blame:
+nothing else. `status:` stays `confirmed` and the body stays untouched.
+
+The tripwire keeps firing too. The next edit to `src/pay.py` still shows the
+full warning, with a footnote appended: `(Unresolved reader dispute on file —
+not owner-verified: "PR #700 (merged 2026-06-01) fixed the vendor rounding
+bug; *2 may no longer be needed". An owner resolves it via /lore:verify.)`
+The warning itself is never reframed by a dispute.
+
+In `/lore:ask`, `/lore:onboard`, and `/lore:verify`, the same dispute renders
+with its author and age read live from git blame:
 `⚠ unresolved dispute (newjoiner, 2026-07-14 — not owner-verified): …`.
 An owner resolves it, not the disputer.
 
@@ -251,28 +257,31 @@ Resolving disputes is an owner action: had `newjoiner` run the sweep
 instead, Claude would name who qualifies (blame authors / CODEOWNERS of
 `src/pay.py`) and leave the dispute standing.
 
-Then the sweep continues: remaining stale notes ⇒ walk through
-**re-confirm / update / retire**. Last, draft promotion — the two batch
-drafts from §3 come up. Jane vouches for the `RefundQueue` why-note; her
-email matches blame on `src/refunds/queue.py`, so it flips to
-`confirmed_by: jane` with a fresh `verified_sha`. She isn't sure the 60s
-retry window is still right, so that one stays `draft` for whoever owns
-`retry.py`. Three more flags surface automatically in the same sweep: a
-runbook anchored to a file deleted last quarter is marked a **retire
-candidate** (the code the fact describes is gone); a dispute nobody has
-touched in over 90 days gets "stale dispute — resolve it or it is noise";
-and a hand-written `glossary` note predating `verified_sha` tracking has no
-baseline commit at all — a **never-verified** category, distinct from both
-fresh and stale, rendered as "no baseline — never verified against any
-commit." Jane confirms it's still accurate and stamps its first
-`verified_sha`. The summary comes in two lines, split by when their facts
-exist: a **sweep-counts** line known before any decision (fresh / stale /
-disputed / never-verified / retire-candidates / still-draft), and — only
-after the decisions above are made — an **outcome-counts** line (re-confirmed
-/ updated / retired / promoted / disputed-resolved / stale-disputes),
-counting only decisions actually made this session. A sweep that ends before
-the asks are answered renders the sweep line alone; the outcome line is never
-shown as zeros the loop didn't produce.
+Then the sweep continues: remaining stale notes get the same
+**re-confirm / update / retire** walk. Last comes draft promotion — the two
+batch drafts from §3. Jane vouches for the `RefundQueue` why-note; her email
+matches blame on `src/refunds/queue.py`, so it flips to `confirmed_by: jane`
+with a fresh `verified_sha`. She isn't sure the 60s retry window is still
+right, so that one stays `draft` for whoever owns `retry.py`.
+
+Three more flags surface automatically in the same sweep:
+
+- a runbook anchored to a file deleted last quarter is marked a **retire
+  candidate** — the code the fact describes is gone;
+- a dispute nobody has touched in over 90 days gets "stale dispute — resolve
+  it or it is noise";
+- a hand-written `glossary` note with no baseline commit at all lands in a
+  **never-verified** category — distinct from both fresh and stale, rendered
+  as "no baseline — never verified against any commit." Jane confirms it's
+  still accurate and stamps its first `verified_sha`.
+
+The summary comes in two lines, split by when their facts exist: a
+**sweep-counts** line known before any decision (fresh / stale / disputed /
+never-verified / retire-candidates / still-draft), and — only after the
+decisions above — an **outcome-counts** line counting just the decisions
+actually made this session. A sweep that ends before the asks are answered
+renders the sweep line alone; the outcome line is never shown as zeros the
+loop didn't produce.
 
 ## 7. People flows
 
@@ -342,18 +351,22 @@ whole-project ask switches it to a different, pinned skeleton instead:
 > are jane and newjoiner.
 
 A scoped ask like `/lore:onboard PAY-206 dispute export` (§7) never produces
-this skeleton — only the explicit overview ask does. The section headings above
-are **fixed template literals rendered in a pinned order**; a section whose
-findings list is empty drops its heading and body entirely rather than printing
-an empty one, and tripwires stay in the notes section, never hoisted above
-orientation. Note what's absent: no
-status table, no percentages, no per-component "done/not done" verdict.
-Migrations are cited event-by-event; an area with no history evidence is
-named as "no evidence found," never asserted as legacy. Note also the
-coverage header's `+ 1 docs spot-checked` term: it appears because the
-DOC DRIFT check above actually ran against `docs/ARCHITECTURE.md`, the one
-doc the brief cites for a code claim — a doc merely listed in the docs map
-without being cited for a claim never adds to that count.
+this skeleton — only the explicit overview ask does.
+
+The section headings above are **fixed template literals rendered in a
+pinned order**. A section whose findings list is empty drops its heading and
+body entirely rather than printing an empty one, and tripwires stay in the
+notes section, never hoisted above orientation.
+
+Note what's absent: no status table, no percentages, no per-component
+"done/not done" verdict. Migrations are cited event-by-event; an area with
+no history evidence is named as "no evidence found," never asserted as
+legacy.
+
+Note also the coverage header's `+ 1 docs spot-checked` term. It appears
+because the DOC DRIFT check above actually ran against
+`docs/ARCHITECTURE.md`, the one doc the brief cites for a code claim — a doc
+merely listed in the docs map never adds to that count.
 
 ## 9. Locked-down environments: degrade, don't grind
 
