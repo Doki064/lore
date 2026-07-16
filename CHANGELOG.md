@@ -7,6 +7,79 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-16
+
+Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
+zero data-model field additions (the fourth consecutive prompt/docs-only
+version). Theme: **structure over vigilance**. v0.4/v0.5 proved structural
+output shapes survive a model swap where wording rules don't; the field then
+showed the residual failures are all *phrase*-shaped — an exact-string ban
+("no drift found", "Gaps: none") decays into a reworded paraphrase the next
+model invents. v0.6 stops chasing phrases: where v0.5 banned strings, v0.6
+makes the offending output class **unrenderable by shape**. Scope driven by the
+v0.5 dogfood watchlist plus 16 live two-model sessions on final v0.5 bytes
+(anonymized: no org/repo/ticket/person identifiers — two real local repos and a
+12-note fixture). Verified with plugin-validator + skill-reviewer on final
+bytes after every edit, a hostile prompt-review before tagging, live two-model
+smokes (sonnet + a larger model) on every changed surface, and the hook suite
+green twice in a row (hooks/tests untouched since v0.2).
+
+### Changed
+- **`/lore:ask` coverage header and receipts are now citation-derived** (D1;
+  `ask.md` + the skill's coverage-header rule): after the answer body is
+  composed, the N confirmed / M draft / J disputed counts cover only the notes
+  the body **actually cites by filename** (a note read but not cited earns no
+  count), and `+ N docs spot-checked` **equals the number of per-doc receipt
+  lines rendered** — one receipt (`aligned` or a `DOC DRIFT` line) per doc
+  spot-checked as the source of a claim **about code**; a non-code doc citation
+  earns no receipt and no term. Amends the skill's "actually used"
+  coverage-header rule to this decidable citation form (dual-maintained). The
+  shipped step-4 (capture) and step-5 (dispute-raise) conditional closers are
+  affirmed unchanged — only an unconditioned proactive tail is out.
+- **`/lore:onboard` overview headings are now a verbatim template** (D2;
+  `onboard.md`): the six sections render as **literal heading strings, in a
+  pinned order** — coverage header, "Orientation — what the repo is", "Docs
+  map", "Tripwires + relevant notes", "Decision history + who to ask", and the
+  optional "Getting hands-on (optional) — entry points (cited; unverified as a
+  sequence)". A heading renders **iff** its section's findings list is
+  non-empty; an absent section omits heading and body entirely. Tripwires stay
+  heading 4 (never hoisted above orientation); orientation keeps its specific
+  "no migration evidence found for Z" line as a mandated exception, while the
+  blanket absence form becomes structurally unrenderable.
+- **List-first rendering discipline** (D3; the `using-lore` skill, one shared
+  principle): a slot in any pinned skeleton renders **only by iterating a
+  non-empty findings list** — zero items ⇒ no line, no heading, no sentence;
+  sentence-form empty states ("none found", "no X this sweep", "all N verified
+  — none stale") are structurally out, replacing the per-phrase bans they
+  generalize. An enumerated **mandated-attestation exception list** (frozen in
+  the plan, swept against the skill + ask/onboard/mine/verify) keeps every line
+  a reader is genuinely owed — coverage-header empty states, the
+  permission-degrade one-liner, the redaction report including its "nothing to
+  strip" form, mine's floor "none", who-to-ask's CODEOWNERS-fallback trigger
+  and "no ownership record" finding, orientation's specific absence line, and
+  verify's sweep-counts / outcome-counts / per-note qualification-basis lines —
+  so the cure does not invert into over-suppression.
+- **`/lore:mine` output begins at byte one** (D4; `mine.md`): the first rendered
+  character is part 1's literal heading `1. Floor report.`. Nothing precedes it
+  — no acknowledgment of instructions, no environment or index remark, no meta
+  comment (a "no preamble" remark is itself a preamble). Anything the run must
+  flag (a suspicious index, a degrade, a stale-tool caveat) renders inside its
+  owning part, never ahead of part 1.
+
+### Deferred
+- **SessionStart capture-pointer strengthening** (D5): watchlist item 8's gate
+  opened (one confirmed capture under-trigger event, compounded by mine's blind
+  spot to feature-shaped facts), but the "minimal strengthening" the party
+  converged on **already ships** — `session_start.js` has pointed to
+  `/lore:capture` since v0.2, and the under-trigger event occurred with that
+  pointer live. Any real strengthening therefore exceeds pointer-minimal on n=1
+  evidence against this project's highest change bar (hooks). Resolution: **no
+  hook change in v0.6** (hook tests untouched, regression-only). Recorded for
+  v0.7: the SessionStart-first ordering stays binding, the sharpened admission
+  is **≥2 further under-trigger events**, the candidate shape is a newest-note
+  recency cue on the existing pull-only pointer line, and UserPromptSubmit stays
+  refused unless SessionStart provably cannot carry the signal.
+
 ## [0.5.0] - 2026-07-16
 
 Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,

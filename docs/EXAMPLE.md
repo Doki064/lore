@@ -319,7 +319,7 @@ whole-project ask switches it to a different, pinned skeleton instead:
 
 > `grounded in: 1 confirmed + 2 draft notes (0 disputed) + git history + 1 docs spot-checked`
 >
-> **Orientation.** `payments/` runs a billing pipeline that moved off an
+> **Orientation — what the repo is.** `payments/` runs a billing pipeline that moved off an
 > internal `LegacyBilling` reconciler onto the current `Ledger` service —
 > commit `9c3d1a2` migrated `reconcile()` (see `src/billing/ledger.py`). No
 > migration evidence found in this repo for the refunds pipeline — that
@@ -334,15 +334,19 @@ whole-project ask switches it to a different, pinned skeleton instead:
 > not found in current tree (grep of `src/billing/` finds no `LegacyBilling`
 > symbol); verify with an owner.
 >
-> **Tripwires + notes.** The confirmed `*2` tripwire in `src/pay.py` (§2),
+> **Tripwires + relevant notes.** The confirmed `*2` tripwire in `src/pay.py` (§2),
 > plus the two batch-drafted notes on `RefundQueue` and refund retries (§3).
 >
-> **Decision history / who to ask.** `9c3d1a2` and `65fad85` are the
+> **Decision history + who to ask.** `9c3d1a2` and `65fad85` are the
 > notable commits; recent blame authors of `src/billing/` and `src/pay.py`
 > are jane and newjoiner.
 
 A scoped ask like `/lore:onboard PAY-206 dispute export` (§7) never produces
-this skeleton — only the explicit overview ask does. Note what's absent: no
+this skeleton — only the explicit overview ask does. The section headings above
+are **fixed template literals rendered in a pinned order**; a section whose
+findings list is empty drops its heading and body entirely rather than printing
+an empty one, and tripwires stay in the notes section, never hoisted above
+orientation. Note what's absent: no
 status table, no percentages, no per-component "done/not done" verdict.
 Migrations are cited event-by-event; an area with no history evidence is
 named as "no evidence found," never asserted as legacy. Note also the
