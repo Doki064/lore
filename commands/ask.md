@@ -13,14 +13,29 @@ git history.
 
 2. **Answer.** The answer opens with the coverage header — **byte one;
    nothing renders before it**: no title heading ("## Answer" is the banned
-   shape), no scene-setting, no restatement of the question. The header:
+   shape), no scene-setting, no restatement of the question. The answer is
+   composed in full first, then emitted as one uninterrupted block
+   beginning at the header (the skill's compose-then-emit rule); a
+   readiness or transition sentence and a pre-header separator line are the
+   banned shapes — "Everything checks out against the current tree.
+   Composing the answer." and "This confirms it: …" are the banned shape,
+   as is any verification recap or conclusion sentence ahead of the header;
+   a conclusion drawn from the final check opens the body AFTER the header,
+   never the message. The final message's first byte is the header's own
+   first byte. The header:
    `grounded in: N confirmed + M
    draft notes (J disputed)` followed by the provenance term — N/M count, by
    `status:`, the notes the answer body **cites by filename** (a note read in
    step 1 but not cited earns no count), J is the disputed overlay of those
-   cited notes (either status carrying a `disputed:` line); all three derive
-   from the composed body's own citation set, not recalled — compose the body
-   first, then derive the counts and emit the header above it. The provenance
+   cited notes (either status carrying a `disputed:` line); all three **are
+   the composed citation set's lengths** (the skill's coverage-header rule:
+   one entry per note the body cites by filename, with its status; N = its
+   confirmed entries, M = its draft entries, J = its disputed overlay) —
+   compose the body first, derive the counts from the set, then emit the
+   header above it. Each entry's status comes from that note's frontmatter
+   `status:` line as read this session — a cited draft is always M, never
+   N. A note read but not cited is invisible to the answer: no count, no
+   flags line, no "read but not cited" mention. The provenance
    term and the
    zero-note empty-state phrase are **attempt-based** per the skill's
    coverage-header rule and flip together: git executed → `+ git history`;
@@ -33,7 +48,10 @@ git history.
    executed: "no lore captured for this area yet — everything below is
    live-derived from git"; git never needed: "no lore captured for this area
    yet — everything below is derived from the tree and notes; git history
-   wasn't needed here." Ground every claim in a
+   wasn't needed here." The phrase renders directly under the header in its
+   fixed wording — never repositioned to the end, never reworded to match a
+   different position ("everything above" is the banned edit), never
+   extended with a reason clause. Ground every claim in a
    `path:line`, a commit sha, or a note filename. Surface each note's
    `status` and staleness (label drafts `(draft, unconfirmed)` and stale
    notes `STALE — verify before trusting:`). Any disputed note carries the

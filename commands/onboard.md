@@ -11,15 +11,21 @@ doing anything else.
 The brief **opens with a coverage header — byte one, in both modes; nothing
 renders before it** (no scene-setting, no degrade preamble, no first-person
 methodology remark — "Git history calls are being blocked… I have enough
-from the tree to compose a scoped brief" is the banned shape):
+from the tree to compose a scoped brief" is the banned shape). The brief is
+composed in full first, then emitted as one uninterrupted block beginning
+at the header (the skill's compose-then-emit rule); a readiness or
+transition sentence ("I have everything needed to compose the brief") and a
+pre-header separator line (`---`) are the banned shapes. The header:
 `grounded in: N confirmed + M draft notes (J disputed)` followed by the
 provenance term — N/M count, by
 `status:`, the notes the brief's body **cites by filename** (a note read
 while gathering but not cited earns no count; step-4 mining candidates
 carry no `status:` and never feed these counts), J is the disputed overlay
-of those cited notes; all three derive from the composed brief's own
-citation set, not recalled — compose the brief first, then derive the counts
-and emit the header above it (the skill's coverage-header rule). The provenance
+of those cited notes; all three **are the composed citation set's lengths**
+(the skill's coverage-header rule: one entry per note the body cites by
+filename, with its status; N = its confirmed entries, M = its draft
+entries, J = its disputed overlay) — compose the brief first, derive the
+counts from the set, then emit the header above it. The provenance
 term and the zero-note empty-state phrase are **attempt-based** per the
 skill's coverage-header rule and flip together: git executed → `+ git
 history`; git attempted-and-denied → the degrade substitution; git never

@@ -96,7 +96,20 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
 
 This governs OUTPUT STRUCTURE only; the sweep order above (disputed → stale →
 draft promotion) and the re-confirm/update/retire/promote decision loop are
-**untouched**. What you render is exactly these parts, in order:
+**untouched**. The sweep render (parts 1–3) is composed in full first, then
+emitted as one uninterrupted block beginning at part 1's first rendered
+category group — or, when no category has members, the part-2 sweep-counts
+line (the skill's compose-then-emit rule). A part may render its own
+skeleton name as its heading (`Sweep items` over part 1 is tolerated — a
+label, not a title); the pin then sits directly under it. No title heading
+renders over the skeleton (`# Sweep` is the banned shape) and nothing
+renders before part 1 — no sweep-scope preamble ("grounded sweep of
+`.lore/` (N notes) against HEAD" is the banned shape: the sweep's scope is
+already visible from the items and the counts line) and no completion or
+readiness remark ("Sweep complete. Composing the results below." is the
+banned shape: the sweep's completion is visible from the render itself). Part 4 is untouched by this: it renders after the
+part-3 decisions per its own condition. What you render is exactly these
+parts, in order:
 
 1. **Sweep items.** The per-note one-liners from step 1, grouped by category
    (fresh / stale / disputed / never-verified / retire-candidate, per the

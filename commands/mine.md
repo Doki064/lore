@@ -22,7 +22,9 @@ as much a contract failure as writing them unasked (a genuinely denied Write
 permission is a degrade, not a refusal).
 
 **First byte.** Mine's rendered output begins at part 1's literal heading
-`1. Floor report.` — byte one. Nothing renders before it: no acknowledgment of
+`1. Floor report.` — byte one. Mine's five parts are composed in full
+first, then emitted as one uninterrupted block beginning at
+`1. Floor report.` (the skill's compose-then-emit rule). Nothing renders before it: no acknowledgment of
 instructions, no environment or index remarks, no meta comment (including a
 "no preamble" remark — a no-preamble note is itself a preamble), no degrade
 preamble ("Bash is disallowed this session, so git cannot be executed" ahead
