@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.6.0
+version: 0.7.0
 ---
 
 # Using lore
@@ -57,7 +57,12 @@ reader approves is byte-for-byte what gets written.
   confirmation signal; every rendering of staleness derived from these
   fields must appear alongside the note's status label. A note whose
   `verified_sha` is absent or unresolvable is treated as unverified/stale on
-  read — never fresh. A note is **stale**
+  read — never fresh. When git could not be executed this session, a draft's
+  `verified_sha` renders exactly `unresolvable (git unavailable this
+  session)` — never a sha: a commit sha that did not come from a git command
+  executed **this session** is never a drafting baseline (not one remembered
+  from context, quoted in a doc, or supplied by the environment/harness —
+  none of those are tool results this run can re-verify). A note is **stale**
   when any *file* anchor changed since `verified_sha`:
   `git diff --name-only <verified_sha>..HEAD -- <anchor>` is non-empty.
   Directory anchors never trigger staleness (churn is not falsity); they are
@@ -224,11 +229,20 @@ line; the redaction report, including its `nothing to strip` form;
 `/lore:mine`'s floor found-or-none ("none"); `/lore:onboard` who-to-ask's
 CODEOWNERS-fallback trigger statement and its "no ownership record" finding;
 onboard orientation's "no migration evidence found in this repo for Z" line
-(only for a specific visible Z); and `/lore:verify`'s sweep-counts line, its
+(only for a specific visible Z); `/lore:verify`'s sweep-counts line, its
 outcome-counts line (after the decisions run), and its per-note
-qualification-basis line. These are attestations a reader is owed; render them
-under their own conditions. Anything NOT on this list and NOT backed by a
-findings list does not render.
+qualification-basis line; `/lore:onboard` step-4's mining-fallback
+found-or-none (the explicit "none" inside the unconfirmed-guesses frame);
+and `/lore:mine`'s write-gate deferral line (see "Mine writes are gated" —
+only when a save instruction preceded the present-for-review step). These
+are attestations a reader is owed; render them under their own conditions.
+Anything NOT on this list and NOT backed by a findings list does not render.
+
+**Pinned literals are byte-exact.** A pinned literal (a heading template
+string, a part heading like `1. Floor report.`, a fixed-wording line)
+renders as its exact byte string — no appended or dropped punctuation, no
+synonyms, no rewording. Markdown heading or emphasis markers surrounding
+the literal are tolerated; any change inside the string is not.
 
 ## Doc drift (`/lore:onboard` + `/lore:ask`)
 
@@ -259,6 +273,19 @@ never a free-text grain ("general accuracy" is not falsifiable and earns
 nothing) — so the
 `+ N docs spot-checked` header term and its receipt lines are one render
 condition, not two: N receipt lines ⇔ the term renders with that N.
+
+**Receipt derivation.** Compose the **spot-check list** first — one entry
+per doc spot-checked for this answer/brief: the doc, each concrete grain
+checked, the verdict. Receipt lines render **only by iterating that list**
+in the surface's flags/risk slot — one line per doc; multiple grains
+checked on one doc fold into that doc's single receipt line, and mixed
+verdicts resolve **drift-first**: if any grain on a doc diverged, that
+doc's one receipt is the DOC DRIFT line (citing the drifted grain) — an
+aligned grain never masks a drift and earns no second line. The header's
+`+ N docs spot-checked` N **is that list's length** — one derivation, two
+renderings; neither the count nor the lines are recalled or freshly
+composed at render time. Zero entries ⇒ no term AND no lines.
+
 No `verified_sha` machinery — this is a live check, not note staleness.
 **"STALE" stays reserved for git-deterministic note staleness; doc drift is a
 separate observation flag.**
@@ -275,7 +302,11 @@ readable sources (Read/Grep on the tree, `.lore/` notes); and **label the gap
 explicitly** in the coverage header / empty-state wording ("git history
 unavailable in this session — brief is notes+tree-derived only"). Concretely:
 the coverage header's `+ git history` term becomes `+ tree+notes only (git
-unavailable)` — never claim git grounding the session didn't have. That
+unavailable)` — never claim git grounding the session didn't have — and any
+draft rendered this session carries `verified_sha: unresolvable (git
+unavailable this session)`, never a sha (see the field-semantics rule: a
+sha not obtained from a git command executed this session is not a
+drafting baseline). That
 substitution applies **only when git history itself is unavailable**; if
 only `gh` is blocked, git grounding stands — state the loss as the
 PR-thread source only. **NEVER
@@ -332,6 +363,15 @@ write, it does not forbid it: the same-session go-ahead write is legal and
 **must not be refused** — declining to save approved drafts is as much a
 contract failure as writing them unasked (a genuinely denied Write
 permission is a degrade, not a refusal).
+
+When a save instruction arrived **before** the present-for-review step
+rendered, that step renders — once, as its own line — the fixed deferral
+line: `Your earlier save instruction is deferred, not refused — reply with
+the go-ahead and mine writes exactly the rendered content above.` This is a
+mandated attestation (the truthful explanation, not compliance narration);
+it renders **only** under that condition and only inside a rendered
+present-for-review step — with zero drafts there is no such step and no
+line.
 
 ## Redaction checklist (before anything persists)
 
