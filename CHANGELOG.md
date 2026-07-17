@@ -6,6 +6,34 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-17
+
+Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
+zero new data-model fields. The sixth consecutive prompt/docs-only version.
+
+Theme: **compose first, then emit**. A fresh two-model measurement round
+against the shipped v0.7 showed every trust rule holding — honest blocked-git
+baselines, the write gate, all mandated attestations — and localized the
+remaining drift to output assembly: a model would finish gathering, say so
+("I have everything needed…"), and only then render the artifact whose rules
+it otherwise followed; and a header could still count fewer notes than its
+own body cited. Both fixes extend the same idea that fixed receipt counts in
+v0.7: derive the output from something composed first, instead of policing
+it at render time.
+
+### Changed
+- **Skeleton surfaces compose their output in full, then emit it as one
+  block.** Answers, briefs, mine reports, and verify sweeps begin at their
+  pinned first byte; readiness sentences, pre-header separators, and title
+  headings over a pinned skeleton render nowhere. Verify — the one surface
+  that had no such pin — now carries the same rule.
+- **Header note counts are the citation set's lengths.** The
+  `grounded in: N confirmed + M draft notes (J disputed)` counts are now
+  derived the way receipt counts are: the body's by-filename citation set is
+  composed with the body, and the three counts are that set's per-status
+  lengths — a header can no longer count fewer notes than its own body
+  cites.
+
 ## [0.7.0] - 2026-07-17
 
 Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
