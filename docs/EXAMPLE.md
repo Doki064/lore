@@ -31,14 +31,15 @@ findings from whichever conditional sources actually ran, the drafts
 redaction line, then the closing present-for-review ask. Nothing lands in
 `.lore/` until you give the go-ahead.
 
-> **Floor.** Source 1 — git history (exhaustive): 1 revert, 1 hotfix
-> commit. Source 3 — ADR presence: none (`docs/adr/` has only
-> accepted-and-current decisions).
+> 1. Floor report. Source 1 — git history (exhaustive): 1 revert, 1 hotfix
+> commit. Source 3 — ADR presence: `docs/adr/` exists, decisions
+> accepted-and-current.
 >
-> **Source 2 — PR review threads (`gh` present):** one candidate, a
-> reviewer comment on the merged PR touching `src/refunds/vendor.py`.
+> 2. **Conditional-source findings.** PR review threads (`gh` present): one
+> candidate, a reviewer comment on the merged PR touching
+> `src/refunds/vendor.py`.
 >
-> **Drafts (rendered, not written).**
+> 3. **Drafts (rendered, not written).**
 
 ```markdown
 # .lore/tripwire-billing-export-revert.md
@@ -71,11 +72,11 @@ aggressively, vendor started rate-limiting us"; a PR reviewer confirmed
 the same limit independently.
 ```
 
-> redaction pass: nothing to strip
+> 4. **Redaction report.** redaction pass: nothing to strip
 >
-> Two ways to keep these: **go-ahead now** and mine writes exactly the
-> rendered content, or **promote later** via `/lore:verify` or PR review.
-> Write these to `.lore/` now?
+> 5. **Closing.** Two ways to keep these: **go-ahead now** and mine writes
+> exactly the rendered content, or **promote later** via `/lore:verify` or
+> PR review. Write these to `.lore/` now?
 
 Nothing is written until you say go — mine renders the drafts, it doesn't
 persist them. On go-ahead, each file lands byte-for-byte as the block above.
@@ -193,8 +194,6 @@ warning re-alerts once with a `STALE — verify before trusting:` prefix.
 > - `src/pay.py:2` — `return amount * 2  # retry-safe`
 > - Note `.lore/tripwire-pay-double-charge.md` (status: **confirmed**,
 >   verified 2026-07-14 at `65fad85`): compensates a vendor rounding bug…
->
-> Staleness: anchor unchanged since verification.
 
 The first line is the coverage header — at a glance, how much of the answer
 is team-verified versus inferred. Unknown answers are never invented —
@@ -328,13 +327,13 @@ whole-project ask switches it to a different, pinned skeleton instead:
 
 > `grounded in: 1 confirmed + 2 draft notes (0 disputed) + git history + 1 docs spot-checked`
 >
-> **Orientation — what the repo is.** `payments/` runs a billing pipeline that moved off an
+> **Orientation — what the repo is** — `payments/` runs a billing pipeline that moved off an
 > internal `LegacyBilling` reconciler onto the current `Ledger` service —
 > commit `9c3d1a2` migrated `reconcile()` (see `src/billing/ledger.py`). No
 > migration evidence found in this repo for the refunds pipeline — that
 > area isn't asserted as legacy, just unevidenced either way.
 >
-> **Docs map.**
+> **Docs map**
 > - `docs/ARCHITECTURE.md` — service boundaries, billing/refunds split.
 > - `docs/adr/0004-ledger-migration.md` — why reconciliation moved off
 >   `LegacyBilling`.
@@ -343,10 +342,10 @@ whole-project ask switches it to a different, pinned skeleton instead:
 > not found in current tree (grep of `src/billing/` finds no `LegacyBilling`
 > symbol); verify with an owner.
 >
-> **Tripwires + relevant notes.** The confirmed `*2` tripwire in `src/pay.py` (§2),
+> **Tripwires + relevant notes** — the confirmed `*2` tripwire in `src/pay.py` (§2),
 > plus the two batch-drafted notes on `RefundQueue` and refund retries (§3).
 >
-> **Decision history + who to ask.** `9c3d1a2` and `65fad85` are the
+> **Decision history + who to ask** — `9c3d1a2` and `65fad85` are the
 > notable commits; recent blame authors of `src/billing/` and `src/pay.py`
 > are jane and newjoiner.
 
@@ -372,15 +371,15 @@ merely listed in the docs map never adds to that count.
 
 Same overview ask, but in a hardened session where every `git` call is
 denied by policy. Claude doesn't hammer the permission wall or coach you to
-widen it — one line names the gap, and the coverage header stops claiming
-git grounding:
+widen it — the coverage header (still byte one, nothing renders before it)
+stops claiming git grounding, and one line names the gap:
 
+> `grounded in: 1 confirmed + 2 draft notes (0 disputed) + tree+notes only
+> (git unavailable)`
+>
 > git calls are blocked in this session — decision history and blame-based
 > "who to ask" are omitted; this brief is derived from the tree and
 > `.lore/` notes only.
->
-> `grounded in: 1 confirmed + 2 draft notes (0 disputed) + tree+notes only
-> (git unavailable)`
 
 Everything notes and the tree can support still arrives (tripwires, note
 bodies, the docs map); everything that needed git is named as missing

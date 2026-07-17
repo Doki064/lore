@@ -45,6 +45,9 @@ inconsistently. v0.7 closes those gaps and adds no new surface.
   contract's own text previously rendered some with trailing periods and
   some without), and one rule now defines "verbatim": exact byte string,
   surrounding markdown markers tolerated, changes inside the string not.
+- **`/lore:ask` answers open at byte one.** The coverage header is the
+  first thing rendered — no title heading, no scene-setting, no
+  restatement of the question (the same pin onboard briefs already carry).
 - The mandated-attestation list (the honest lines the no-narration rules
   must never suppress) grows from 10 to 12: onboard's mining-fallback
   "none" was always mandated but missing from the list, and the write-gate
