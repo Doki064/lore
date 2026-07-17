@@ -80,7 +80,11 @@ write-side trust rule. Run a sweep over this repo's `.lore/`, in this order:
 5. **Summarize — two count lines, split by when their facts exist.**
    **Sweep counts** (known at sweep time, before any decision): fresh /
    stale / disputed / never-verified (notes missing `verified_sha`) /
-   retire-candidates (notes flagged in step 1) / still-draft.
+   retire-candidates (notes flagged in step 1) / still-draft. `fresh` counts
+   only `status: confirmed` notes whose file anchors are unchanged since
+   `verified_sha`; a `status: draft` note is **never fresh** — it counts under
+   **still-draft** (plus any flag category it earned, e.g. retire-candidate).
+   The stale/disputed overlay overlap is intended and unchanged.
    **Outcome counts** (they exist only AFTER the step 2–4 decisions):
    re-confirmed / updated / retired / promoted / disputed-resolved /
    stale-disputes (>90 days, flagged in step 2) — counting only decisions

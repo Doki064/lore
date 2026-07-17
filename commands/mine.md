@@ -13,7 +13,9 @@ that go-ahead, **do not call Write or Edit on any `.lore/` path** — mine
 renders its drafts as exact file content, it does not persist them. An
 instruction to save given **before** part 5 renders ("save whatever you
 find", "write them to disk") is **not** the go-ahead — the go-ahead exists
-only as the user's reply after part 5 has rendered. The gate
+only as the user's reply after part 5 has rendered. When such an early
+instruction arrived, part 5 renders the fixed deferral attestation (output
+part 5 below). The gate
 **defers** the write, it does not forbid it: the same-session go-ahead write
 is **legal and must not be refused** — declining to save approved drafts is
 as much a contract failure as writing them unasked (a genuinely denied Write
@@ -22,8 +24,10 @@ permission is a degrade, not a refusal).
 **First byte.** Mine's rendered output begins at part 1's literal heading
 `1. Floor report.` — byte one. Nothing renders before it: no acknowledgment of
 instructions, no environment or index remarks, no meta comment (including a
-"no preamble" remark — a no-preamble note is itself a preamble), and no
-repo-summary sentence ("Only 3 commits total, all on `main`, no tags, no
+"no preamble" remark — a no-preamble note is itself a preamble), no degrade
+preamble ("Bash is disallowed this session, so git cannot be executed" ahead
+of part 1 is the banned shape — the degrade line renders **inside** part 1),
+and no repo-summary sentence ("Only 3 commits total, all on `main`, no tags, no
 reverts" is the banned shape — those facts belong INSIDE part 1 as floor
 findings). This holds on any repo size, any degrade state. Anything the
 run must flag (a suspicious index, a degrade, a stale-tool caveat) renders
@@ -46,6 +50,11 @@ the way `/lore:ask` does (the skill's permission-degrade rule): render the
 floor report's unavailable state (output part 1 below) as the **one fixed
 degrade line, with no methodology narration around it**, and continue with
 the tree-readable sources only (ADRs via Read/Glob, CODEOWNERS if present).
+Every draft the tree-readable sources still produce carries exactly
+`verified_sha: unresolvable (git unavailable this session)` — **never** a sha.
+A commit sha not obtained from a git command executed **this session** — one
+remembered from context, quoted in a doc, or supplied by the
+environment/harness — is **never** a drafting baseline.
 **Do not reconstruct history by reading `.git/` internals** (reflog,
 `COMMIT_EDITMSG`, packed refs): a scrape of those files is not the
 deterministic floor — its commit↔file links are inferences, and drafts
@@ -135,7 +144,7 @@ placeholder ("none", "—", "n/a") for it, and never explain why a part is
 empty (that explanation is itself absent-source narration). Only the floor
 report (part 1) has a mandatory empty state (its explicit "none").
 
-1. **Floor report.** Always renders, in exactly one of three states: the
+1. Floor report. Always renders, in exactly one of three states: the
    exhaustive source-1 findings plus ADR presence (source 3); an explicit
    **"none"**; or — under blocked git (D6 above) — the line "git history
    unavailable — the deterministic floor cannot run", with ADR presence
@@ -153,8 +162,9 @@ report (part 1) has a mandatory empty state (its explicit "none").
 3. **Drafts (rendered, not written).** The ≤5 drafts, each shown as the
    **exact file content** a go-ahead would persist — frontmatter then body —
    in **one fenced block**; nothing here is written to disk. Every
-   draft carries `verified_sha: <HEAD at drafting>` and
-   `verified_date: <today>` (the drafting baseline per the skill's split
+   draft carries `verified_sha: <HEAD at drafting>` (or, under blocked git,
+   the D6 value `verified_sha: unresolvable (git unavailable this session)`)
+   and `verified_date: <today>` (the drafting baseline per the skill's split
    field semantics; `status: draft`).
 4. **Redaction report.** The fixed one-line slot, rendered **iff** external
    human-authored text (commit-message quotes, PR/ticket/ADR quotes) was
@@ -172,7 +182,13 @@ processed this run:
    comment-drop note in part 1 is owned by part 1 — not re-listed here.) Then
    the present-for-review ask, naming the two real paths: **go-ahead now** —
    mine then writes exactly the rendered fenced content — or **promote later**
-   via `/lore:verify` or PR review. Write no files before that go-ahead.
+   via `/lore:verify` or PR review. Write no files before that go-ahead. When
+   a save instruction arrived **before** part 5 rendered, part 5 also renders
+   — **once, as its own line** — the fixed deferral attestation `Your earlier
+   save instruction is deferred, not refused — reply with the go-ahead and
+   mine writes exactly the rendered content above.` It renders **only** under
+   that condition and **only** inside a rendered part 5 (zero drafts ⇒ no part
+   5 ⇒ no line); it is a mandated attestation, not compliance narration.
    **With zero drafts rendered, part 5 is omitted entirely** — there is
    nothing to review, and "nothing was mined this run" narration is banned
    (the floor report's empty or unavailable state already carries that

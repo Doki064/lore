@@ -47,13 +47,17 @@ note's `disputed:` line. Whenever the brief cites or quotes a human doc as
 the source for a claim about code, spot-check that claim against the current
 tree first (the skill's doc-drift rule); on a grep-verifiable divergence emit
 `DOC DRIFT — <doc path> references <thing>, not found in current tree
-(<citation>); verify with an owner.` **Every doc you spot-check emits exactly
-one receipt line in the risk-flags slot** — that DOC DRIFT line on a
+(<citation>); verify with an owner.` Each spot-check composes one entry on the
+**spot-check list** — the doc, the concrete grain(s) checked, and the verdict
+— built with the brief, not recalled after; the **risk-flags slot** renders
+exactly **one** receipt line per list entry (one per doc — multiple grains on
+one doc fold into that doc's single line) — that DOC DRIFT line on a
 divergence, otherwise the aligned receipt
 `<doc path> — checked <claim → tree target> — aligned` (the skill's
-one-receipt-per-doc rule); N receipt lines ⇔ the `+ N docs spot-checked`
-term. Only for docs the brief actually relies on, never a repo-wide doc
-audit.
+one-receipt-per-doc rule). The `+ N docs spot-checked` term's N **is the
+spot-check list's length** (derived, not recalled): N receipt lines in the
+risk-flags slot ⇔ the term, zero entries ⇒ neither. Only for docs the brief
+actually relies on, never a repo-wide doc audit.
 
 **Render skeleton (scoped mode).** A rendering pin of steps 1–7 — no step's
 semantics change, no step is dropped, tripwires stay first. Step 1 routes (to
@@ -101,8 +105,9 @@ brief-body and gaps slots.
    incident/fix/workaround/hotfix-keyed commits from `git log`, plus ADRs if
    a `docs/adr/`, `docs/decisions/`, or `adr/` directory exists — restricted
    to the scoped paths only. Apply these signals **exhaustively within scope
-   and report what you found** (or an explicit "none") — never a sampled
-   subset. Present the results under exactly this frame:
+   and report what you found** (or an explicit "none" — a mandated attestation
+   on the skill's exempt list, not suppressible empty-state prose) — never a
+   sampled subset. Present the results under exactly this frame:
    "Unconfirmed guesses from git history — not team-verified lore. Confirm
    with an owner before relying on these." Each candidate cites a sha the
    reader can `git show`. **Write no files.** Close the section by offering
@@ -164,7 +169,7 @@ never gated on findings. Enrichment may vary freely within a rendered
 section:
 
 1. **Coverage header** (the header above), counts scoped to the whole repo.
-2. **Orientation — what the repo is.** Where a legacy-vs-current split of
+2. **Orientation — what the repo is**. Where a legacy-vs-current split of
    any kind is visible — a migration, rewrite, or replacement of services,
    frameworks, data stores, pipelines, or anything else — report **cited
    migration events only** —
@@ -184,7 +189,7 @@ section:
    omission itself ("omitted
    rather than guessed at" is banned prose — an empty section is silent). Give trade-offs only when a human wrote them
    somewhere citable (quote + cite).
-3. **Docs map.** Entry-point human docs, each **named + cited** with a
+3. **Docs map**. Entry-point human docs, each **named + cited** with a
    one-line description — names and cites, does not reproduce or explain their
    content. The map itself triggers **no** per-doc code checking; the
    doc-drift flag (intro) applies only to docs whose claims the brief actually
@@ -192,7 +197,7 @@ section:
 4. **Tripwires + relevant notes** — steps 2–3 above, whole-repo.
 5. **Decision history + who to ask** — steps 5–6 above, whole-repo.
 6. **Getting hands-on (optional) — entry points (cited; unverified as a
-   sequence).** Renders **only** when the tree holds at least one
+   sequence)**. Renders **only** when the tree holds at least one
    manifest/CI/Make-class file, a tests directory, or a docs index — plain
    source files never qualify as entry points and never earn this part. At
    most 5 lines, each a **noun-phrase pointer** (no leading verb) to such an

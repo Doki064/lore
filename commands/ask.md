@@ -11,7 +11,10 @@ git history.
    Otherwise grep note bodies and frontmatter for the question's keywords and
    read the matches.
 
-2. **Answer.** Open with the coverage header: `grounded in: N confirmed + M
+2. **Answer.** The answer opens with the coverage header — **byte one;
+   nothing renders before it**: no title heading ("## Answer" is the banned
+   shape), no scene-setting, no restatement of the question. The header:
+   `grounded in: N confirmed + M
    draft notes (J disputed)` followed by the provenance term — N/M count, by
    `status:`, the notes the answer body **cites by filename** (a note read in
    step 1 but not cited earns no count), J is the disputed overlay of those
@@ -49,13 +52,18 @@ git history.
    one line each. A step that found nothing gets **no line anywhere**,
    including inside the answer prose — never a "searched and found nothing"
    sentence. A doc cited or quoted as the source for a claim **about code** is
-   spot-checked (the skill's code-claim test); each spot-check performed
-   renders exactly **one** receipt flag line — the DOC DRIFT line on a
-   divergence, else `<doc path> — checked <claim → tree target> — aligned`
-   (the skill's one-receipt-per-doc rule). A doc mentioned without sourcing a
-   code claim earns neither spot-check nor receipt. The `+ N docs spot-checked`
-   header term's N **equals the number of receipt lines rendered** (derived,
-   not recalled), and it renders iff at least one is present.
+   spot-checked (the skill's code-claim test); each spot-check composes one
+   entry on the **spot-check list** — the doc, the concrete grain(s) checked,
+   and the verdict — built with the answer, not recalled after. The flags
+   position renders exactly **one** receipt line per list entry (one per doc —
+   multiple grains on one doc fold into that doc's single line) — the DOC
+   DRIFT line on a divergence, else `<doc path> — checked <claim → tree
+   target> — aligned` (the skill's one-receipt-per-doc rule). A doc mentioned
+   without sourcing a code claim earns no entry, no spot-check, and no
+   receipt. The `+ N docs spot-checked` header term's N **is the spot-check
+   list's length** (derived from the composed list, not recalled), and the
+   term renders iff the list is non-empty — zero entries ⇒ no term and no
+   receipt lines.
 
    **Terminal pin.** After the flags position, only the step-4 capture offer
    and the step-5 dispute-raise offer below may render — each unchanged and
