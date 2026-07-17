@@ -6,6 +6,50 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-17
+
+Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
+zero new data-model fields. The fifth consecutive prompt/docs-only version.
+
+Theme: **the decidability release** — every trust promise gradeable from the
+output alone. A fresh two-model measurement round against the shipped v0.6
+showed the structural rules held exactly where they are structural and
+drifted where a promise still depended on judgment at render time: receipt
+counts disagreeing with receipt lines, a real commit sha rendered as a
+verification baseline in a session where git was blocked, and pinned
+headings drifting by punctuation the contract itself rendered
+inconsistently. v0.7 closes those gaps and adds no new surface.
+
+### Changed
+- **Doc-check receipts are derived from one list.** Every answer or brief
+  composes its spot-check list first (one entry per doc checked); the
+  receipt lines render only by iterating that list, and the
+  `+ N docs spot-checked` count is the list's length. The count and the
+  lines can no longer disagree, and receipts render only in the flags slot
+  — never woven into body prose.
+- **Blocked-git drafts are honest about their baseline.** When git could
+  not run this session, a draft's `verified_sha` renders exactly
+  `unresolvable (git unavailable this session)` — never a sha. A sha that
+  didn't come from a git command executed this session (remembered from
+  context, quoted in a doc, or supplied by the environment) is never a
+  drafting baseline.
+- **The mine write gate now explains itself.** If you ask mine to save
+  before its review step has rendered, the review step says so in one fixed
+  line — the instruction is deferred, not refused — instead of leaving the
+  model to improvise an explanation the contract used to ban.
+- **Verify categories no longer overlap on status.** `fresh` counts only
+  confirmed notes whose anchors are unchanged; a draft is never fresh — it
+  counts under still-draft.
+- **Pinned literals are byte-exact, with a stated tolerance.** All heading
+  and part-title literals are normalized to one exact string each (the
+  contract's own text previously rendered some with trailing periods and
+  some without), and one rule now defines "verbatim": exact byte string,
+  surrounding markdown markers tolerated, changes inside the string not.
+- The mandated-attestation list (the honest lines the no-narration rules
+  must never suppress) grows from 10 to 12: onboard's mining-fallback
+  "none" was always mandated but missing from the list, and the write-gate
+  deferral line is new.
+
 ## [0.6.0] - 2026-07-16
 
 Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,
