@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.7.0
+version: 0.8.0
 ---
 
 # Using lore
@@ -116,6 +116,14 @@ carrying a `disputed:` line — never a third status bucket. Counts are
 earns no count, so the header can never claim a note the body does not use;
 J is the disputed overlay of those cited notes. Empty is stated, never
 silently omitted.
+
+The citation set is **composed with the body** exactly as the spot-check
+list is — one entry per note the body cites by filename, carrying that
+note's `status:` and whether it holds a `disputed:` line. **N, M, and J
+are that set's lengths** — N its `confirmed` entries, M its `draft`
+entries, J its disputed overlay — one derivation, one rendering; none of
+the three is recalled, estimated, or adjusted after composition. Compose
+the body, derive the header from the set, then emit.
 
 **The provenance term and the zero-note empty-state phrase are
 attempt-based** — they flip **together**, and neither ever claims grounding
@@ -243,6 +251,30 @@ string, a part heading like `1. Floor report.`, a fixed-wording line)
 renders as its exact byte string — no appended or dropped punctuation, no
 synonyms, no rewording. Markdown heading or emphasis markers surrounding
 the literal are tolerated; any change inside the string is not.
+
+**Compose, then emit.** Every surface with a pinned first byte or output
+skeleton (`/lore:ask`, `/lore:onboard`, `/lore:mine`, `/lore:verify`)
+composes its rendered artifact **in full first**, then emits it as **one
+uninterrupted block whose first byte is the surface's pin** (a tolerated
+surrounding markdown marker on the pin's own line counts as the pin, and a
+part's own skeleton name rendered as a label heading directly above the pin
+— verify's `Sweep items` — also counts, the pin sitting directly under it)
+— ask/onboard: the coverage header; mine: `1. Floor report.`; verify: part
+1's first rendered category group (or, when no category has members, the
+sweep-counts line). A surface that legally stages emits each stage's block
+in full: verify's composed block is the sweep render (parts 1–3), part 4
+follows the decision loop. Assembly is the mechanism, not render-time
+vigilance — the same one-derivation principle as receipt derivation.
+Between the last gathering step and the artifact, nothing joins the block:
+a readiness or transition sentence ("I have everything needed to compose
+the brief" is the banned shape), a separator line in the pre-first-byte
+position (`---` stays legal as a note's frontmatter delimiter and as an
+in-body rule), and a title heading over a skeleton that pins no title
+(`# Sweep` over the verify skeleton is the banned shape) are pre-artifact
+preamble and render nowhere. A mandated attestation triggered during
+gathering (a permission-degrade line, a redaction report) is not
+pre-artifact preamble — it renders inside its owning slot within the
+composed block, under its own render condition.
 
 ## Doc drift (`/lore:onboard` + `/lore:ask`)
 
