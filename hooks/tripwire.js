@@ -41,7 +41,9 @@ const dirNorm = slash(dir);
 if (!fs.existsSync(path.join(dir, '.lore'))) bail();
 
 const file = (data && data.tool_input && data.tool_input.file_path) || '';
-const sid = (data && data.session_id) || 'nosession';
+// sid is only a dedupe-key fragment here, but it lands in a marker FILENAME —
+// sanitize separators instead of bailing so a weird sid still gets its warning.
+const sid = String((data && data.session_id) || 'nosession').replace(/[\\/]/g, '_');
 if (!file) bail();
 
 // Relativize; never warn on edits to the notes themselves. Anchors are always
