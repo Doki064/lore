@@ -1,7 +1,7 @@
 ---
 name: using-lore
 description: This skill should be used when reading or writing `.lore/` knowledge notes, answering questions from team lore, or capturing tribal knowledge.
-version: 0.8.0
+version: 0.9.0
 ---
 
 # Using lore
@@ -123,7 +123,11 @@ note's `status:` and whether it holds a `disputed:` line. **N, M, and J
 are that set's lengths** — N its `confirmed` entries, M its `draft`
 entries, J its disputed overlay — one derivation, one rendering; none of
 the three is recalled, estimated, or adjusted after composition. Compose
-the body, derive the header from the set, then emit.
+the body, derive the header from the set, then emit. **A note filename
+rendered anywhere in the composed output is a citation and is counted; a
+note not counted is never named.** An answer whose substance is absence
+names no notes — the honest-absence wording carries the diligence,
+filenames stay out.
 
 **The provenance term and the zero-note empty-state phrase are
 attempt-based** — they flip **together**, and neither ever claims grounding
@@ -274,7 +278,52 @@ in-body rule), and a title heading over a skeleton that pins no title
 preamble and render nowhere. A mandated attestation triggered during
 gathering (a permission-degrade line, a redaction report) is not
 pre-artifact preamble — it renders inside its owning slot within the
-composed block, under its own render condition.
+composed block, under its own render condition. Doc-drift receipts are part
+of this assembly: they are composed into the surface's flags/risk slot with
+their **placement decided at compose time**, never re-judged at render. A
+receipt line and its `+ N docs spot-checked` count are earned **only** by a
+spot-checked body code-claim citation; naming a doc without checking a code
+claim against it — an onboard Docs-map entry, a README merely read —
+triggers no check and earns no receipt and no count.
+
+## Sanctioned next-step pointers
+
+Every discretionary next-step offer any surface or hook may render is collected here — one table,
+single-sourced; each surface cites it **by name** at its own pin. An offer
+is a capture/dispute/promote suggestion, an owner ask, a resume prompt, a
+guided-path tail, or any prompt to run another `/lore:*` command.
+
+| Sanctioned pointer | Renders when |
+| --- | --- |
+| `/lore:ask` step-4 capture offer | a fact was resolved **this session** that no note covered — lore absence alone is never the trigger |
+| `/lore:ask` step-5 dispute-raise offer | the reader contests a cited note with checkable evidence |
+| `/lore:verify` part-3 owner asks (promote / retire / dispute) | the sweep produced eligible notes |
+| `/lore:verify` part-4 outcome resume | the step 2–4 decisions ran |
+| `/lore:mine` part-5 write-gate ask | drafts were rendered |
+| `/lore:onboard` guided-path tail | its own render rule holds (≥1 qualifying entry-point artifact) |
+| Hook-rendered pointers — the SessionStart awareness line; the onboarding-persistence injected line | hook-rendered, outside model control |
+
+A discretionary offer not in this table is unsanctioned and renders nowhere;
+a table offer renders **only when its listed condition held this session**,
+checked at compose time like any attestation condition. This is the
+**opposite polarity** to the mandated-attestation list (which stays
+exactly 12): a mandated attestation renders even when its count is zero or
+its finding is an absence, whereas a sanctioned pointer stays silent unless
+its condition holds — and the polarity cuts both ways: when a table entry's
+condition DID hold this session, the pointer renders; omitting a
+held-condition pointer is graded exactly as suppressing a mandated
+attestation. A command's own mandated pins that carry offer wording
+are attestations of that class, not discretionary offers, and render under
+their own pins: onboard's step-4 mining-fallback close (its
+`/lore:mine`/`/lore:capture` persist offer) and onboard's fixed closing
+tail (`/lore:ask`, with its conditional `/lore:capture`/`/lore:mine`).
+
+Injected onboarding context — the `lore:` `additionalContext` line the
+onboard-persistence hook adds to later prompts in an onboarded session — is
+background grounding only: it is never narrated, quoted, or referenced in
+any composed output, and it licenses no offers — a command the injected
+line mentions (`/lore:ask`) does not thereby become a sanctioned pointer
+on any surface; the table alone governs.
 
 ## Doc drift (`/lore:onboard` + `/lore:ask`)
 
