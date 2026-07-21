@@ -6,6 +6,55 @@ All notable changes to the lore plugin. Format follows
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-21
+
+Three prompt/docs-level fixes, lore's first new hook since v0.2
+(onboarding-session persistence), and a small hardening fix to the
+tripwire hook.
+
+Theme: **derive it, don't recall it — for suggestions and citations too**. A
+fresh two-model measurement round against the shipped v0.8 found the
+compose-then-emit and citation-derivation rules holding everywhere already
+pinned, but surfaced two further gaps: a command could still append a
+follow-up suggestion whose trigger hadn't actually held this session, and a
+coverage header could name a note in an answer's body without counting it (or
+vice versa). Both fixes extend the v0.7/v0.8 idea of deriving output from
+something composed first: every suggestion's render condition now lives in
+one shared table instead of per-surface judgment, and a header's note count
+is now identical to the set of notes the body actually names. Doc spot-check
+receipts get the same treatment — placed at compose time, and earned only by
+checking a code claim, not by reading or listing a doc.
+
+### Added
+- **Onboarding-session persistence** — the plugin's first new hook since
+  v0.2. After `/lore:onboard` runs, a `UserPromptSubmit` hook injects one
+  fixed line into later prompts of that same session: ground answers in
+  `.lore/`, cite notes by filename, prefer `/lore:ask` for lore questions.
+  State is a per-user temp-directory marker keyed by session id — nothing is
+  written to the target repo, other sessions are unaffected, and every
+  failure path stays silent.
+
+### Changed
+- **One table governs every follow-up suggestion.** A capture offer, a
+  dispute-raise prompt, a promotion/retire ask — every discretionary
+  next-step a command may render — now renders only when its listed session
+  condition actually held, per one shared table in the `using-lore` skill.
+  No more speculative "want me to run X?" tails.
+- **A named note is always a counted note, and vice versa.** A note filename
+  appearing anywhere in an answer or brief is a citation and is counted in
+  the coverage header; a note that isn't counted is never named. An answer
+  whose substance is "nothing covers this" names no notes at all.
+- **Doc spot-check receipts are placed at compose time and earned, not
+  assumed.** Receipt lines and the `+ N docs spot-checked` count land in the
+  flags slot as part of the same compose step as the rest of the output. A
+  receipt is earned only by checking a code claim against the doc — merely
+  listing or reading a doc earns nothing.
+
+### Fixed
+- **tripwire: session ids are sanitized before naming marker files.** Path
+  separators in a `session_id` are replaced with `_` instead of reaching the
+  marker filename raw; an unusual session id still gets its warning.
+
 ## [0.8.0] - 2026-07-17
 
 Prompt/docs-level release on the unchanged v0.2 runtime — zero hook changes,

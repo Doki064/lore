@@ -16,8 +16,9 @@ One note = one fact = one anchored markdown file in the target repo's
 carry provenance, a verification baseline, and a `draft`/`confirmed` status;
 there is no index and no external database. The `/lore:*` commands are
 **prompt markdown** — the only runtime code is the tripwire hook (a
-PreToolUse edit gate) and a one-line session-start awareness message. Scope
-is deliberately single-repo.
+PreToolUse edit gate), a one-line session-start awareness message, and a
+one-line onboarding-session persistence hook that keeps later prompts
+lore-grounded after `/lore:onboard` runs. Scope is deliberately single-repo.
 
 **Who it's for.** Wikis rot, buddies have no bandwidth, and the knowledge
 that burns new joiners is tacit: tripwires, the *why* behind weird code, who
@@ -41,13 +42,14 @@ the **target repo's** `.lore/`, not this plugin's. See
 
 | Surface | What it does |
 |---|---|
-| `/lore:ask` | Grounded Q&A from lore + code + git history. Every claim is cited; drafts and stale notes are labeled; the coverage header's counts are **derived from what the answer actually cites**, and it routes to a human when it doesn't know. |
+| `/lore:ask` | Grounded Q&A from lore + code + git history. Every claim is cited; drafts and stale notes are labeled; a note named anywhere in the answer is always among the coverage header's counts, and a note not counted is never named — an answer with nothing to cite names no notes. It routes to a human when it doesn't know. |
 | `/lore:capture` | Draft a note from the current session — dedup, anchor lint, redaction, then confirmed-or-draft by the trust rule. No-argument runs batch-triage up to 3 session facts, always written `draft`. Under 10 seconds of human time. |
 | `/lore:mine` | Cold start: seed draft notes from reverts and incident commits, PR review threads (via `gh`), ADRs, and CODEOWNERS. A **write gate** renders every draft as exact file content and persists nothing until your explicit go-ahead; output begins at byte one with `1. Floor report.` |
 | `/lore:onboard` | A brief scoped to the ticket in front of you — tripwires first, decision history, who to ask; writes nothing. An explicit whole-project ask enters **overview mode**: a fixed template of verbatim section headings plus an optional "getting hands-on" list of cited entry points. |
 | `/lore:offboard` | Departing engineer: a bus-factor scan finds their solo areas, then an in-context interview drafts the notes before the knowledge walks out. |
 | `/lore:verify` | Staleness/dispute sweep: re-confirm, update, or retire notes whose anchors changed, and promote vetted drafts. Renders sweep counts at sweep time and outcome counts only after the decisions are made. |
 | **tripwire gate** (hook) | Editing a file guarded by a confirmed tripwire? The first edit attempt is denied once with the warning as the reason; the immediate retry passes. Once per note per session; stale notes re-alert once, labeled. |
+| **onboarding persistence** (hook) | After `/lore:onboard`, later prompts in that session stay lore-grounded via one invisible background line — never quoted in answers, nothing written to your repo, gone when the session ends. |
 
 ## Trust contract
 
@@ -73,9 +75,16 @@ every command invokes by name. In brief:
   empty states ("none found", "no drift") are structurally out. An enumerated
   set of mandated attestations (coverage header, permission-degrade line,
   redaction report, and a few others) is the only exception.
+- **Suggestions render only when earned.** Every follow-up a command may
+  offer — a capture offer, a dispute-raise prompt, a promotion/retire ask —
+  is governed by one shared table of session conditions; unless its
+  condition actually held this session, the offer doesn't render. No
+  speculative "want me to run X?" tails.
 - **Receipts-earned claims.** A claim of work renders only with a
   reader-falsifiable receipt. `+ N docs spot-checked` appears only when N
-  per-doc receipt lines (`aligned` or `DOC DRIFT`) are present.
+  per-doc receipt lines (`aligned` or `DOC DRIFT`) are present, and a
+  receipt is earned only by checking a code claim against the doc — reading
+  or merely listing a doc earns nothing.
 
 ## Locked-down environments
 

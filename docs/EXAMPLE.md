@@ -316,6 +316,14 @@ newer corner of `payments/` with no `.lore/` coverage at all:
 Nothing gets written — the brief is entirely ephemeral. Decision history
 below this section skips both commits since they're already shown above.
 
+One thing does linger, invisibly: for the rest of that session, every
+prompt stays lore-grounded without you re-invoking anything — a hook adds
+one background context line ("ground answers in `.lore/`, cite notes")
+after `/lore:onboard` runs. You never see it, it never appears in answers,
+and nothing is written to your repo (the hook keeps a tiny session-keyed
+marker in your user temp directory). It ends with the session; a new
+session starts fresh until you onboard again.
+
 ## 8. Overview mode: asking for the whole project
 
 `/lore:onboard` normally scopes to a ticket or area (§7). An **explicit**
