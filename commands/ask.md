@@ -18,8 +18,11 @@ git history.
    beginning at the header (the skill's compose-then-emit rule); a
    readiness or transition sentence and a pre-header separator line are the
    banned shapes — "Everything checks out against the current tree.
-   Composing the answer." and "This confirms it: …" are the banned shape,
-   as is any verification recap or conclusion sentence ahead of the header;
+   Composing the answer.", "This confirms it: …", `Now I have everything
+   needed.`, and `Have everything needed. Composing the answer.` are the
+   banned shape, as is any verification recap or conclusion
+   sentence ahead of the header, and as is a `---` rule line (or any
+   separator line) rendered before the header;
    a conclusion drawn from the final check opens the body AFTER the header,
    never the message. The final message's first byte is the header's own
    first byte. The header:
@@ -34,13 +37,23 @@ git history.
    compose the body first, derive the counts from the set, then emit the
    header above it. Each entry's status comes from that note's frontmatter
    `status:` line as read this session — a cited draft is always M, never
-   N. A note read but not cited is invisible to the answer: no count, no
-   flags line, no "read but not cited" mention. The provenance
+   N, and a cited confirmed note is always N, never M: the header's counts
+   and the flags line's own status labels derive from the same composed set
+   and can never disagree (a flags line labeling two notes `draft` under a
+   header claiming `2 confirmed + 0 draft` is the banned outcome, whichever
+   direction the inversion runs). A note read but not cited is invisible to the answer: no count, no
+   flags line, no "read but not cited" mention. Per the skill's
+   coverage-header rule, **a note filename rendered anywhere in the composed
+   output is a citation and is counted; a note not counted is never named** —
+   and an answer whose substance is absence names no notes — the
+   honest-absence wording carries the diligence, filenames stay out. The provenance
    term and the
    zero-note empty-state phrase are **attempt-based** per the skill's
    coverage-header rule and flip together: git executed → `+ git history`;
    git attempted-and-denied → the degrade substitution; git never attempted →
-   `+ tree+notes (git history not needed for this answer)`. git history stays
+   `+ tree+notes (git history not needed for this answer)`. Exactly one of
+   the three pinned terms renders — never a hand-composed variant
+   (`+ tree + git history` is the banned shape). git history stays
    the default source for why/decision/history questions. When doc-drift
    spot-checks ran on docs the answer cites, the header also gains
    `+ N docs spot-checked`. If none of the notes gathered in step 1 answer
@@ -54,7 +67,12 @@ git history.
    extended with a reason clause. Ground every claim in a
    `path:line`, a commit sha, or a note filename. Surface each note's
    `status` and staleness (label drafts `(draft, unconfirmed)` and stale
-   notes `STALE — verify before trusting:`). Any disputed note carries the
+   notes `STALE — verify before trusting:`). Surfacing a status label
+   REQUIRES the staleness check behind it: every cited note's file anchors
+   are checked against its `verified_sha` (the skill's staleness rule)
+   before its label renders — a stale note rendered with a bare
+   `(confirmed)` and no STALE prefix is a trust failure, the exact class
+   the tripwire exists to prevent. Any disputed note carries the
    footnote: `⚠ unresolved dispute (<blame-author>, <blame-date> — not
    owner-verified): <reason>`, with author/date read live via `git
    blame`/`git log -1` on that note's `disputed:` line. If a claim here rests
@@ -84,8 +102,14 @@ git history.
    receipt lines.
 
    **Terminal pin.** After the flags position, only the step-4 capture offer
-   and the step-5 dispute-raise offer below may render — each unchanged and
-   only in its shipped condition; nothing else renders after the flags. That
+   and the step-5 dispute-raise offer below may render — entries 1 and 2 of
+   the skill's sanctioned-pointer table, each rendering only when its listed
+   condition held this session; any other next-step pointer (a `/lore:verify`
+   nudge, an unprompted capture offer, and `/lore:ask` itself — an ask answer
+   never offers `/lore:ask`; "/lore:ask for further questions." is the banned
+   shape, including when injected session context mentions the command) is
+   unsanctioned and renders nowhere
+   after the flags. That
    includes methodology asides: a parenthetical about how the answer was
    derived ("*(git history isn't the crux here — the answer is grep- and
    tree-derived)*" is the banned shape) renders nowhere — not after the
@@ -99,8 +123,16 @@ git history.
    denied, routing degrades per the skill's permission-walls rule —
    git-unavailability is never read as a stale/absent author signal.
 
-4. **Close the loop.** If you just resolved something that was previously
-   unknown, offer `/lore:capture` so the answer is only worked out once.
+4. **Close the loop.** Offer `/lore:capture` **only** when this session
+   resolved a specific fact that was previously unknown and that no `.lore/`
+   note already covered — so the answer is worked out only once (the skill's
+   sanctioned-pointer table, entry 1). The **absence** of lore for this area
+   is never itself the trigger: a thin or empty `.lore/` does not earn the
+   offer; a fact must have been resolved this session. The condition cuts
+   both ways (the table's polarity rule): when this session DID resolve such
+   a fact — an investigation concluded, a mechanism worked out, and no note
+   covers it — the offer **renders**; omitting it then is the same failure
+   as suppressing a mandated attestation.
 
 5. **Offer to raise a dispute.** If the asker contradicts a note you
    surfaced and backs it with checkable evidence (a sha, a PR, current

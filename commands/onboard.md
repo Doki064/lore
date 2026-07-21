@@ -62,8 +62,14 @@ divergence, otherwise the aligned receipt
 `<doc path> — checked <claim → tree target> — aligned` (the skill's
 one-receipt-per-doc rule). The `+ N docs spot-checked` term's N **is the
 spot-check list's length** (derived, not recalled): N receipt lines in the
-risk-flags slot ⇔ the term, zero entries ⇒ neither. Only for docs the brief
-actually relies on, never a repo-wide doc audit.
+risk-flags slot ⇔ the term, zero entries ⇒ neither — and the identity cuts
+both ways: rendering a receipt line while omitting the term from the header
+is the same identity failure as rendering the term without receipts. Only for docs the brief
+actually relies on, never a repo-wide doc audit. The receipt renders in the
+risk-flags slot ONLY and in the pinned form ONLY — a spot-check sentence
+inside Orientation (or any other section), or a reworded receipt
+("Spot-check: <doc>'s <thing> … — aligned" is the banned shape), is the
+receipt-placement failure, not a substitute rendering.
 
 **Render skeleton (scoped mode).** A rendering pin of steps 1–7 — no step's
 semantics change, no step is dropped, tripwires stay first. Step 1 routes (to
@@ -73,7 +79,12 @@ render exactly these slots in order; a slot with nothing to render is
 anywhere:
 - **Coverage header** — the header above.
 - **Tripwires + risk flags** — step 2 (tripwires FIRST and prominent), then
-  staleness labels, DOC DRIFT lines, and the per-doc receipt lines.
+  staleness labels, DOC DRIFT lines, and the per-doc receipt lines. Receipts
+  are composed into this slot at compose time (the skill's receipt-composition
+  rule) — placement fixed there, never re-judged at render — and a receipt
+  line and its `+ N docs spot-checked` count are earned **only** by a
+  spot-checked body code-claim citation; naming a doc in the Docs map
+  (Overview heading 3) triggers no check and earns no receipt.
 - **Brief body** — steps 3 and 5 (relevant notes + live decision history),
   citations inline.
 - **Who to ask** — step 6, in the two-state shape below.
@@ -200,12 +211,18 @@ section:
    content. The map itself triggers **no** per-doc code checking; the
    doc-drift flag (intro) applies only to docs whose claims the brief actually
    relies on and cites.
-4. **Tripwires + relevant notes** — steps 2–3 above, whole-repo.
+4. **Tripwires + relevant notes** — steps 2–3 above, whole-repo. In
+   overview mode this heading HOSTS the risk-flags slot: doc-drift receipt
+   lines render inside this section, after the tripwires block — never
+   under a standalone label or heading of their own ("**Risk flags**" as
+   its own section is the banned shape).
 5. **Decision history + who to ask** — steps 5–6 above, whole-repo.
 6. **Getting hands-on (optional) — entry points (cited; unverified as a
    sequence)**. Renders **only** when the tree holds at least one
    manifest/CI/Make-class file, a tests directory, or a docs index — plain
-   source files never qualify as entry points and never earn this part. At
+   source files never qualify as entry points and never earn this part. This
+   guided-path tail is entry 6 of the skill's sanctioned-pointer table,
+   rendering only under the render condition just stated. At
    most 5 lines, each a **noun-phrase pointer** (no leading verb) to such an
    artifact verified present in the tree, each with its citation. A command
    string may appear only **quoted verbatim from one of those files** —
@@ -220,9 +237,15 @@ section:
    are missing ("no test suite, CI config, or manifest exists" is banned
    prose).
 
-After the last rendered section, **one closing line** offering `/lore:ask`
-(and `/lore:mine` when `.lore/` is empty) may render — a pointer, not a
-recap; nothing else renders after it.
+After the last rendered section, **one closing line** renders in exactly
+one of two byte-fixed forms — a pinned literal like the empty-state
+phrase, not a sentence you compose:
+- `.lore/` has notes → exactly `/lore:ask for follow-up questions.`
+- `.lore/` is empty → exactly `/lore:ask for follow-up questions, or
+  /lore:mine to seed draft notes.`
+Nothing renders after it and nothing is appended to it — no second
+command, no purpose clause, no session recap. `/lore:capture` never
+appears on the overview tail (it is the scoped tail's rider only).
 
 **Workflow labels are verbatim and cited.** Where the overview organizes the
 repo by its workflows or pipelines, group around the repo's OWN evidenced

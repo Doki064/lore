@@ -143,7 +143,10 @@ Your entire output is these five top-level parts and nothing else — no
 preamble, no compliance narration, no naming of absent sources. A part with
 nothing to render is **omitted entirely** — never render an empty
 placeholder ("none", "—", "n/a") for it, and never explain why a part is
-empty (that explanation is itself absent-source narration). Only the floor
+empty (that explanation is itself absent-source narration). Omission never
+renumbers: each rendered part keeps its own skeleton number (parts 1, 3, 4,
+5 with part 2 omitted — never relabeled 1–4; part 5 is part 5 even when it
+renders third). Only the floor
 report (part 1) has a mandatory empty state (its explicit "none").
 
 1. Floor report. Always renders, in exactly one of three states: the
@@ -184,7 +187,10 @@ processed this run:
    comment-drop note in part 1 is owned by part 1 — not re-listed here.) Then
    the present-for-review ask, naming the two real paths: **go-ahead now** —
    mine then writes exactly the rendered fenced content — or **promote later**
-   via `/lore:verify` or PR review. Write no files before that go-ahead. When
+   via `/lore:verify` or PR review. This write-gate ask is entry 5 of the
+   skill's sanctioned-pointer table — it renders only when drafts were
+   rendered (zero drafts ⇒ no part 5, no ask). Write no files before that
+   go-ahead. When
    a save instruction arrived **before** part 5 rendered, part 5 also renders
    — **once, as its own line** — the fixed deferral attestation `Your earlier
    save instruction is deferred, not refused — reply with the go-ahead and

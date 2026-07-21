@@ -99,7 +99,11 @@ draft promotion) and the re-confirm/update/retire/promote decision loop are
 **untouched**. The sweep render (parts 1–3) is composed in full first, then
 emitted as one uninterrupted block beginning at part 1's first rendered
 category group — or, when no category has members, the part-2 sweep-counts
-line (the skill's compose-then-emit rule). A part may render its own
+line with every category at zero (the skill's compose-then-emit rule): on an
+empty sweep the counts line IS the render — a prose sentence in its place
+("The `.lore/` directory exists but contains only a `.gitkeep` placeholder —
+no notes to sweep." and any "no notes to sweep" sentence-form are the banned
+shape) is the same failure as suppressing the counts line. A part may render its own
 skeleton name as its heading (`Sweep items` over part 1 is tolerated — a
 label, not a title); the pin then sits directly under it. No title heading
 renders over the skeleton (`# Sweep` is the banned shape) and nothing
@@ -123,10 +127,13 @@ parts, in order:
    basis (e.g. "no CODEOWNERS; sole committer on the anchors") stays
    **REQUIRED** — it is the promotion gate's receipt (the skill's earned-claim
    principle), NOT absent-source narration; a future editor must not strip it.
+   These owner asks are entry 3 of the skill's sanctioned-pointer table — they
+   render only when the sweep produced eligible notes.
 4. **Outcome counts line** — step-5's outcome counts, rendered **only after
    the part-3 decisions have been answered** and counting only decisions
    actually made this session; a session that ends before the decisions
    omits this line entirely (zeros the loop didn't produce are fabrication,
-   not reporting).
+   not reporting). This post-decision resume is entry 4 of the skill's
+   sanctioned-pointer table (condition: the decisions ran).
 5. Nothing else — no preamble, no closing advice, no compliance narration.
    Observations outside the sweep (e.g. repo hygiene) have no slot.
